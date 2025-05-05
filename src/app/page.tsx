@@ -7,7 +7,7 @@ export default async function HomePage() {
 
   // Redirect to dashboard if authenticated, otherwise to login
   if (session) {
-    redirect("/dashboard")
+    redirect("/dashbaord") // Fixed the typo here
   } else {
     redirect("/login")
   }

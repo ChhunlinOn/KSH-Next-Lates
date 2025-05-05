@@ -69,6 +69,8 @@ export async function login(email: string, password: string): Promise<LoginRespo
       maxAge: 60 * 60 * 24 * 7, // 1 week
       path: "/",
     })
+    console.log("JWT:", cookieStore.get("jwt")?.value)
+    // console.log("JWT:",localStorage.getItem("jwtToken"))
 
     // Store user data in cookies
     cookieStore.set("userRole", roleName || "", {
@@ -116,13 +118,17 @@ export async function logout() {
   redirect("/login")
 }
 
+// import { redirect } from "next/navigation"
+
 export async function getSession() {
-  const cookieStore = cookies()
-  const jwt = (await cookieStore).get("jwt")?.value
-  const userRole = (await cookieStore).get("userRole")?.value
-  const userImage = (await cookieStore).get("userImage")?.value
+  const cookieStore = await cookies()
+  const jwt = cookieStore.get("jwt")?.value
+  const userRole = cookieStore.get("userRole")?.value
+  const userImage = cookieStore.get("userImage")?.value
 
   if (!jwt) {
+    // Redirect to the login page if no JWT is found
+    redirect("/login")
     return null
   }
 

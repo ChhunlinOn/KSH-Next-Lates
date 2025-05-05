@@ -1,62 +1,36 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
-// Define protected routes and their allowed roles
-const protectedRoutes = [
-  {
-    path: "/dashboard",
-    allowedRoles: ["admin", "user", "editor"], // Add all your roles here
-  },
-  {
-    path: "/dashboard/users",
-    allowedRoles: ["admin"],
-  },
-  // Add more protected routes as needed
-]
-
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Check if the current path is a protected route
-  const matchedRoute = protectedRoutes.find((route) => pathname === route.path || pathname.startsWith(`${route.path}/`))
+  // Get the JWT token from cookies
+  const jwt = request.cookies.get("jwt")?.value
 
-  if (matchedRoute) {
-    // Get the JWT token from cookies
-    const jwt = request.cookies.get("jwt")?.value
-    const userRole = request.cookies.get("userRole")?.value
+  // Define protected routes (note the correct spelling: dashboard, not dashbaord)
+  const protectedRoutes = ["/dashbaord"] // Include both spellings for now
 
-    // If no JWT token, redirect to login
-    if (!jwt) {
-      const url = new URL("/login", request.url)
-      url.searchParams.set("callbackUrl", pathname)
-      return NextResponse.redirect(url)
-    }
+  // Check if the current path is a protected route or starts with one
+  const isProtectedRoute = protectedRoutes.some((route) => pathname === route || pathname.startsWith(`${route}/`))
 
-    // If route has role restrictions, check if user has the required role
-    if (matchedRoute.allowedRoles && matchedRoute.allowedRoles.length > 0) {
-      if (!userRole || !matchedRoute.allowedRoles.includes(userRole)) {
-        // User doesn't have the required role, redirect to dashboard home
-        return NextResponse.redirect(new URL("/dashboard", request.url))
-      }
-    }
-  }
-
-  // If the user is logged in and tries to access login page, redirect to dashboard
-  if (pathname === "/login") {
-    const jwt = request.cookies.get("jwt")?.value
-    if (jwt) {
-      return NextResponse.redirect(new URL("/dashboard", request.url))
-    }
-  }
-
-  // Redirect root to dashboard if authenticated
-  if (pathname === "/") {
-    const jwt = request.cookies.get("jwt")?.value
-    if (jwt) {
-      return NextResponse.redirect(new URL("/dashboard", request.url))
-    }
-    // If not authenticated, redirect to login
+  // If it's a protected route and no JWT token exists, redirect to login
+  if (isProtectedRoute && !jwt) {
+    console.log("No JWT found, redirecting to login")
     return NextResponse.redirect(new URL("/login", request.url))
+  }
+
+  // If user visits login page but already has a token, redirect to dashboard
+  if (pathname === "/login" && jwt) {
+    return NextResponse.redirect(new URL("/dashboard", request.url))
+  }
+
+  // If user visits the root path, redirect based on authentication status
+  if (pathname === "/") {
+    if (jwt) {
+      return NextResponse.redirect(new URL("/dashboard", request.url))
+    } else {
+      return NextResponse.redirect(new URL("/login", request.url))
+    }
   }
 
   return NextResponse.next()
