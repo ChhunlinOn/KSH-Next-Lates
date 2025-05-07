@@ -113,6 +113,8 @@ export async function logout() {
   cookieStore.delete("jwt")
   cookieStore.delete("userRole")
   cookieStore.delete("userImage")
+  cookieStore.delete("userName")
+  cookieStore.delete("userId")
 
   // Redirect to login page after logout
   redirect("/login")
@@ -128,7 +130,7 @@ export async function getSession() {
 
   if (!jwt) {
     // Redirect to the login page if no JWT is found
-    redirect("/login")
+    // redirect("/login")
     return null
   }
 

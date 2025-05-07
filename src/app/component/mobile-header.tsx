@@ -18,14 +18,14 @@ export function MobileHeader() {
   const { setOpenMobile } = useSidebar()
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-40 h-14 border-b bg-white shadow-sm md:hidden">
+    <header className="fixed top-0 left-0 right-0 z-40 h-14 border-b bg-[#f5f0e0] shadow-sm md:hidden">
       <div className="flex h-full items-center justify-between px-4">
         <button
           onClick={() => setOpenMobile(true)}
           className="flex h-10 w-10 items-center justify-center rounded-md hover:bg-gray-100"
           aria-label="Open menu"
         >
-          <Menu className="h-5 w-5" />
+          <Menu className="h-5 w-5 border-[10px]" />
         </button>
 
         <h1 className="text-lg font-bold text-green-700">KSH</h1>

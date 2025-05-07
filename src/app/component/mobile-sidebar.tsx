@@ -5,18 +5,19 @@ import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
 import { useSidebar } from "@/components/ui/sidebar"
 import { logout } from "@/app/action/auth"
 import { useRouter } from "next/navigation"
-
+import Image from "next/image"
 export function MobileSidebar() {
   const { openMobile, setOpenMobile } = useSidebar()
   const router = useRouter()
 
   const menuItems = [
-    { name: "Residents", icon: Users, active: true, href: "/dashboard/residents" },
-    { name: "Programs", icon: BookOpen, href: "/dashboard/programs" },
-    { name: "Assessment", icon: ClipboardList, href: "/dashboard/assessment" },
-    { name: "Reporting", icon: BarChart2, href: "/dashboard/reporting" },
-    { name: "Medical", icon: Heart, href: "/dashboard/medical" },
-    { name: "Generate", icon: Zap, href: "/dashboard/generate" },
+    { name: "Residents", Img: "/resident_5e1d62f6a2.png", active: true, href: "/dashboard/residents" },
+    { name: "Programs",  Img: "/resident_5e1d62f6a2.png", href: "/dashboard/programs" },
+    { name: "Assessment",  Img: "/resident_5e1d62f6a2.png", href: "/dashboard/assessment" },
+    { name: "Reporting", Img: "/resident_5e1d62f6a2.png", href: "/dashboard/reporting" },
+    { name: "Medical",  Img: "/resident_5e1d62f6a2.png", href: "/dashboard/medical" },
+    { name: "Generate",  Img: "/resident_5e1d62f6a2.png", href: "/dashboard/generate" },
+    
   ]
 
   const handleSignOut = async () => {
@@ -31,12 +32,15 @@ export function MobileSidebar() {
 
   return (
     <Sheet open={openMobile} onOpenChange={setOpenMobile}>
-      <SheetContent side="left" className="w-[250px] p-0 md:hidden">
+      <SheetContent
+        side="left"
+        className="w-[250px] p-0 md:hidden [&>button]:border [&>button]:border-gray-600 [&>button]:rounded-[5px] bg-[#f5f0e0]"
+        >
         {/* Add SheetTitle for accessibility */}
         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
 
         <div className="flex flex-col h-full">
-          <div className="border-b border-gray-200 py-4 px-4">
+          <div className="border-b border-gray-300 py-4 px-4">
             <h2 className="text-xl font-bold text-green-700">KSH Dashboard</h2>
           </div>
 
@@ -48,11 +52,19 @@ export function MobileSidebar() {
                   onClick={() => handleNavigation(item.href)}
                   className={`flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-left ${
                     item.active
-                      ? "bg-gray-100 font-medium text-gray-900"
-                      : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                      ? "!bg-green-700 !text-white"
+                      : "hover:bg-[#f5f1e4] text-gray-700 hover:text-green-800"
                   }`}
                 >
-                  <item.icon className="h-5 w-5" />
+                  <div className="w-20 h-13 mr-6 flex-shrink-0 group-hover:scale-105 transition-transform duration-200">
+                                        <Image
+                                          src={item.Img || "/placeholder.svg"}
+                                          alt={`${item.name} icon`}
+                                          width={80}
+                                          height={80}
+                                          className="object-fit"
+                                        />
+                                      </div>
                   <span>{item.name}</span>
                 </button>
               ))}
