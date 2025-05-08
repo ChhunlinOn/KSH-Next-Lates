@@ -61,12 +61,16 @@ const ResidentDetailPage: React.FC = () => {
         </Link>
 
         <div className="flex space-x-6">
+          <Link href='/dashbaord/pages/residentChecklist'>
           <button className="bg-green-700 text-white px-6 py-2 rounded-lg shadow-md hover:bg-green-600 transition duration-300 text-sm sm:text-base">
             Program
           </button>
+          </Link>
+          <Link href='/dashbaord/pages/medical' >
           <button className="bg-red-700 text-white px-6 py-2 rounded-lg shadow-md hover:bg-red-600 transition duration-300 text-sm sm:text-base">
             Medical
           </button>
+     </Link>
         </div>
       </div>
 
