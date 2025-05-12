@@ -27,22 +27,22 @@ export function KshSidebar() {
   // Main navigation items with image icons
   const mainNavItems = [
     {
-      name: "Dashboard",
+      name: "Residents",
       imageSrc: "/resident_5e1d62f6a2.png",
-      path: "/dashbaord",
-      active: isActive("/dashbaord"),
+      path: "/dashbaord/pages/resident",
+      active: isActive("/dashbaord/pages/resident"),
     },
     {
-      name: "Calendar",
+      name: "Settings",
       imageSrc: "/resident_5e1d62f6a2.png",
-      path: "/dashboard/calendar",
-      active: isActive("/dashboard/calendar"),
+      path: "/dashbaord/settings",
+      active: isActive("/dashbaord/settings"),
     },
     {
-      name: "Messages",
+      name: "Medical",
       imageSrc: "/resident_5e1d62f6a2.png",
-      path: "/dashboard/messages",
-      active: isActive("/dashboard/messages"),
+      path: "/dashbaord/pages/medical",
+      active: isActive("/dashbaord/pages/medical"),
     },
   ]
 
@@ -90,7 +90,9 @@ export function KshSidebar() {
                         className="object-fit"
                       />
                     </div>
-                    <span className="text-xl font-semibold truncate">{item.name}</span>
+                    <span className="text-xl font-semibold truncate">
+                    {item.name}
+                  </span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

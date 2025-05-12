@@ -5,8 +5,15 @@ import DropdownYearResident from '../../../component/dropDownYearResident';
 import { FaPlus } from 'react-icons/fa';
 import { FaTimes } from "react-icons/fa";
 
+interface ResidentListProps {
+  session: {
+    jwt: string;
+    userRole?: string;
+    userImage?: string;
+  } | null;
+}
 
-const ResidentList: React.FC = () => {
+const ResidentList: React.FC<ResidentListProps> = ({ session }) => {
   const [residents, setResidents] = useState<any[]>([
     {
       id: '1',
