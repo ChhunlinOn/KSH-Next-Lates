@@ -1,173 +1,91 @@
-"use client"
-import React, { useState } from 'react';
-import { FaEdit, FaSignOutAlt, FaTimes } from 'react-icons/fa';
+"use client";
+import React from "react";
+import { FaUser, FaArrowRight } from "react-icons/fa";
+import Link from "next/link";
+const users = [
+  {
+    id: 1,
+    fullName: "Canyon.",
+    email: "john.doe@example.com",
+    role: "Administrator",
+    image: "https://static.vecteezy.com/system/resources/thumbnails/038/962/461/small/ai-generated-caucasian-successful-confident-young-businesswoman-ceo-boss-bank-employee-worker-manager-with-arms-crossed-in-formal-wear-isolated-in-white-background-photo.jpg"
+  },
+  {
+    id: 2,
+    fullName: "Jane Smith",
+    email: "jane.smith@example.com",
+    role: "Manager",
+    image: "https://i.pinimg.com/736x/0e/bd/b9/0ebdb9f8cb628dc5224bd2f84a2ff9e2.jpg"
+  },
 
-const ProfilePage = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  {
+    id: 3,
+    fullName: "Mark Johnson",
+    email: "mark.j@example.com",
+    role: "Team Lead",
+    image: "https://i.pinimg.com/736x/c5/35/0f/c5350f084e43aa828f0503831ab69912.jpg"
+  },  {
+    id: 4,
+    fullName: "Mark Johnson",
+    email: "mark.j@example.com",
+    role: "Team Lead",
+    image: "https://i.pinimg.com/736x/bd/e3/af/bde3afba0942342f02ce5a62f6b0b3c4.jpg"
+  },  {
+    id: 5,
+    fullName: "Mark Johnson",
+    email: "mark.j@example.com",
+    role: "Team Lead",
+    image: "https://i.pinimg.com/736x/18/79/73/1879732a4edf5c5c776277a175a8e433.jpg"
+  },  {
+    id: 6,
+    fullName: "Mark Johnson",
+    email: "mark.j@example.com",
+    role: "Team Lead",
+    image: "https://i.pinimg.com/736x/57/2b/98/572b9886a26a463fc37672b267946be3.jpg"
+  },
+];
 
-  const [profile, setProfile] = useState({
-    fullName: 'Canyon.',
-    email: 'john.doe@example.com',
-    phone: '+1 234 567 890',
-    location: 'Siem Reap, Cambodia',
-    memberSince: 'Jan 2023',
-  });
+const UserListPage = () => {
 
-  const [formData, setFormData] = useState(profile);
-
-  const handleChange = (e: { target: { name: any; value: any; }; }) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleSubmit = (e: { preventDefault: () => void; }) => {
-    e.preventDefault();
-    setProfile(formData);
-    setIsModalOpen(false);
-    console.log('Updated Profile:', formData); 
-  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 py-24 relative">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-7xl min-h-[700px] flex flex-col lg:flex-row overflow-hidden z-10">
-        
-        <div className="w-full lg:w-1/2 bg-green-50 flex flex-col items-center justify-center p-14 text-center">
-          <img
-            src="https://static.vecteezy.com/system/resources/thumbnails/038/962/461/small/ai-generated-caucasian-successful-confident-young-businesswoman-ceo-boss-bank-employee-worker-manager-with-arms-crossed-in-formal-wear-isolated-in-white-background-photo.jpg"
-            alt="Profile"
-            className="w-60 h-60 rounded-full object-cover shadow-lg border-4 border-green-700"
-          />
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mt-8">{profile.fullName}</h2>
+    <div className="min-h-screen  py-10 px-6 sm:px-10">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-10 text-center">
+          User List
+        </h1>
 
-          <p className="text-2xl text-green-700 font-semibold mt-2">Administrator</p>
-        </div>
-
-        <div className="w-full lg:w-1/2 p-10 sm:p-20 flex flex-col justify-between">
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-12 gap-x-12 lg:gap-y-32 lg:gap-x-32 mb-12">
-
-
-            <div>
-              <p className="text-xl text-gray-500 mb-1">Email</p>
-              <p className="text-xl font-medium text-gray-800">{profile.email}</p>
-            </div>
-            <div>
-              <p className="text-xl text-gray-500 mb-1">Phone</p>
-              <p className="text-xl font-medium text-gray-800">{profile.phone}</p>
-            </div>
-            <div>
-              <p className="text-xl text-gray-500 mb-1">Location</p>
-              <p className="text-xl font-medium text-gray-800">{profile.location}</p>
-            </div>
-            <div>
-              <p className="text-xl text-gray-500 mb-1">Member Since</p>
-              <p className="text-xl font-medium text-gray-800">{profile.memberSince}</p>
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-6 justify-end">
-            <button
-              onClick={() => {
-                setFormData(profile);
-                setIsModalOpen(true);
-              }}
-              className="flex items-center justify-center gap-3 px-4 py-2 bg-green-700 hover:bg-green-800 text-white text-lg rounded-xl shadow transition"
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {users.map((user) => (
+            <div
+              key={user.id}
+              className="bg-green-50 rounded-3xl shadow-lg p-6 flex flex-col items-center text-center"
             >
-              <FaEdit className="text-xl" />
-              Edit Profile
-            </button>
-            <button className="flex items-center justify-center gap-3 px-4 py-2 border border-red-500 text-red-500 text-lg rounded-xl shadow hover:bg-red-100 transition">
-              <FaSignOutAlt className="text-xl" />
-              Sign Out
-            </button>
-          </div>
+              <img
+                src={user.image}
+                alt={user.fullName}
+                className="w-32 h-32 rounded-full object-cover border-4 border-green-700 shadow"
+              />
+              <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 mt-4">
+                {user.fullName}
+              </h2>
+              <p className="text-green-600 font-medium">{user.role}</p>
+              <p className="text-gray-500 text-sm mt-1">{user.email}</p>
+              <Link href="/dashbaord/pages/profile/profileInfo">
+              <button
+                className="mt-6 flex items-center gap-2 px-4 py-2 bg-green-700 hover:bg-green-800 text-white text-sm rounded-xl transition"
+              >
+                <FaUser />
+                View Profile
+                <FaArrowRight className="ml-1" />
+              </button>
+              </Link>
+            </div>
+          ))}
         </div>
       </div>
-
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black/30 bg-opacity-50 flex items-center justify-center z-50 p-4">
-<div className="bg-white px-4 py-6 sm:px-8 sm:py-10 rounded-2xl w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl shadow-lg relative">
-<button
-                  onClick={() => setIsModalOpen(false)}
-                  className="absolute top-3 right-4 text-2xl text-gray-500 hover:text-red-500"
-      >
-        &times;
-      </button>
-<h3 className="text-2xl font-semibold mb-6 text-center">Edit Profile</h3>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Full Name</label>
-                <input
-                  type="text"
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Phone</label>
-                <input
-                  type="text"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Location</label>
-                <input
-                  type="text"
-                  name="location"
-                  value={formData.location}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Member Since</label>
-                <input
-                  type="text"
-                  name="memberSince"
-                  value={formData.memberSince}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-                />
-              </div>
-
-              <div className="flex flex-col sm:flex-row sm:justify-between gap-6">
-
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-               className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-5 py-2 rounded-md w-full sm:w-auto flex items-center justify-center gap-2"
-             >
-               <FaTimes className="text-sm" />
-               Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-green-700 hover:bg-green-800 text-white rounded-lg"
-                >
-                  Save
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
 
-export default ProfilePage;
+export default UserListPage;
