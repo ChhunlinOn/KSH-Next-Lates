@@ -12,8 +12,9 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar"
 import { User, LogOut, Settings, HelpCircle } from 'lucide-react'
-import { logout } from "../action/auth"
+// import { logout } from "../action/auth"
 import { useRouter, usePathname } from "next/navigation"
+import path from "path"
 
 export function KshSidebar() {
   const router = useRouter()
@@ -44,11 +45,29 @@ export function KshSidebar() {
       path: "/dashbaord/pages/medical",
       active: isActive("/dashbaord/pages/medical"),
     },
+    {
+      name: "Programs",
+      imageSrc: "/resident_5e1d62f6a2.png",
+      path: "/dashbaord/pages/program",
+      active: isActive("/dashbaord/pages/program"),
+    },
+    {
+      name: "Assessment",
+      imageSrc: "/resident_5e1d62f6a2.png",
+      path: "/dashbaord/pages/assessment",
+      active: isActive("/dashbaord/pages/assessment"),
+    },
+    {
+      name: "salary",
+      imageSrc: "/resident_5e1d62f6a2.png",
+      path: "/dashbaord/pages/salary",
+      active: isActive("/dashbaord/pages/salary"),
+    }
   ]
 
-  const handleSignOut = async () => {
-    await logout()
-  }
+  // const handleSignOut = async () => {
+  //   await logout()
+  // }
 
   const navigateTo = (path: string) => {
     router.push(path)
@@ -149,7 +168,7 @@ export function KshSidebar() {
 
             <SidebarMenuItem>
               <SidebarMenuButton
-                onClick={handleSignOut}
+                // onClick={handleSignOut}
                 className="text-red-600 hover:text-red-700 hover:bg-[#ebe3d1] py-3 px-4"
               >
                 <LogOut className="h-5 w-5 mr-3" />

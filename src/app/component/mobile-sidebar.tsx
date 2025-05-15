@@ -3,7 +3,7 @@
 import { Users, BookOpen, ClipboardList, BarChart2, Heart, Zap, User, LogOut } from "lucide-react"
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
 import { useSidebar } from "@/components/ui/sidebar"
-import { logout } from "@/app/action/auth"
+// import { logout } from "@/app/action/auth"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 export function MobileSidebar() {
@@ -22,7 +22,7 @@ export function MobileSidebar() {
 
   const handleSignOut = async () => {
     setOpenMobile(false)
-    await logout()
+    // await logout()
   }
 
   const handleNavigation = (href: string) => {

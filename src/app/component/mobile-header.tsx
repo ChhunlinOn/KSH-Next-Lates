@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { LogOut } from "lucide-react"
-import { logout } from "../action/auth"
+// import { logout } from "../action/auth"
 import { useSidebar } from "@/components/ui/sidebar"
 
 export function MobileHeader() {
