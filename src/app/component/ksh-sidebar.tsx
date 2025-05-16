@@ -34,12 +34,6 @@ export function KshSidebar() {
       active: isActive("/dashbaord/pages/resident"),
     },
     {
-      name: "Settings",
-      imageSrc: "/resident_5e1d62f6a2.png",
-      path: "/dashbaord/settings",
-      active: isActive("/dashbaord/settings"),
-    },
-    {
       name: "Medical",
       imageSrc: "/resident_5e1d62f6a2.png",
       path: "/dashbaord/pages/medical",

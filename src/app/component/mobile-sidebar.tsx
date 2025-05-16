@@ -17,7 +17,6 @@ export function MobileSidebar() {
 
   const menuItems = [
     { name: "Residents", Img: "/resident_5e1d62f6a2.png", href: "/dashbaord/pages/resident" },
-    { name: "Settings", Img: "/resident_5e1d62f6a2.png", href: "/dashbaord/settings" },
     {
       name: "Medical",
       Img: "/resident_5e1d62f6a2.png",
