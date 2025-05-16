@@ -35,25 +35,25 @@ export function KshSidebar() {
     },
     {
       name: "Medical",
-      imageSrc: "/resident_5e1d62f6a2.png",
+      imageSrc: "/heart.png",
       path: "/dashbaord/pages/medical",
       active: isActive("/dashbaord/pages/medical"),
     },
     {
       name: "Programs",
-      imageSrc: "/resident_5e1d62f6a2.png",
+      imageSrc: "/activities.png",
       path: "/dashbaord/pages/program",
       active: isActive("/dashbaord/pages/program"),
     },
     {
       name: "Assessment",
-      imageSrc: "/resident_5e1d62f6a2.png",
+      imageSrc: "/assessment.png",
       path: "/dashbaord/pages/assessment",
       active: isActive("/dashbaord/pages/assessment"),
     },
     {
       name: "salary",
-      imageSrc: "/resident_5e1d62f6a2.png",
+      imageSrc: "/money.png",
       path: "/dashbaord/pages/salary",
       active: isActive("/dashbaord/pages/salary"),
     }

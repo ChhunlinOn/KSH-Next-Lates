@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import { FaTimes, FaPlus } from "react-icons/fa";
-
+import Link from 'next/link';
 interface SalaryBoxProps {
   month: string;
   day: number;
@@ -112,6 +112,13 @@ const SalaryPage: React.FC = () => {
 
   return (
     <div className="min-h-screen py-10 px-4 relative">
+<div className="w-full md:w-[80%] mx-auto flex justify-start mb-6">
+  <Link href="/dashbaord/pages/salary">
+    <button className="bg-gray-500 text-white px-6 py-2 rounded-lg shadow-md hover:bg-gray-400 transition duration-300">
+      Back
+    </button>
+  </Link>
+</div>
       <div className="flex justify-center mb-6">
         {profileImageUrl ? (
           <img

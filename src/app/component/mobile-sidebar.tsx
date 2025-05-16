@@ -19,22 +19,22 @@ export function MobileSidebar() {
     { name: "Residents", Img: "/resident_5e1d62f6a2.png", href: "/dashbaord/pages/resident" },
     {
       name: "Medical",
-      Img: "/resident_5e1d62f6a2.png",
+      Img: "/heart.png",
       href: "/dashbaord/pages/medical",
     },
     {
       name: "Programs",
-      Img: "/resident_5e1d62f6a2.png",
+      Img: "/activities.png",
       href: "/dashbaord/pages/program",
     },
     {
       name: "Assessment",
-      Img: "/resident_5e1d62f6a2.png",
+      Img: "/assessment.png",
       href: "/dashbaord/pages/assessment",
     },
     {
       name: "salary",
-      Img: "/resident_5e1d62f6a2.png",
+      Img: "/money.png",
       href: "/dashbaord/pages/salary",
     }
   ]
