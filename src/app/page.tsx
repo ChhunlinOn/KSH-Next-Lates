@@ -11,5 +11,5 @@ export default async function HomePage() {
   // } else {
   //   redirect("/login")
   // }
-  redirect
+  redirect('/dashbaord/pages/resident');
 }

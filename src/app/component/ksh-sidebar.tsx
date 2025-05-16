@@ -136,7 +136,7 @@ export function KshSidebar() {
               </SidebarMenuButton>
             </SidebarMenuItem>
 
-            <SidebarMenuItem>
+            {/* <SidebarMenuItem>
               <SidebarMenuButton
                 onClick={() => navigateTo("/dashboard/settings")}
                 isActive={isActive("/dashboard/settings")}
@@ -148,7 +148,7 @@ export function KshSidebar() {
                 <Settings className="h-5 w-5 mr-3" />
                 <span className="text-base">Settings</span>
               </SidebarMenuButton>
-            </SidebarMenuItem>
+            </SidebarMenuItem> */}
 
             <SidebarMenuItem>
               <SidebarMenuButton
