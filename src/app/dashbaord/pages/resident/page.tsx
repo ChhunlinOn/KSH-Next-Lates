@@ -1,13 +1,16 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import BoxResident from "../../../component/boxResident";
 import DropdownYearResident from "../../../component/dropDownYearResident";
 import { FaPlus, FaTimes, FaSearch } from "react-icons/fa";
+// import axois from "axios";
+
 
 
 const ResidentList: React.FC = () => {
+  // const token = "";
   const [residents, setResidents] = useState<any[]>([
     {
       id: "1",
@@ -93,6 +96,29 @@ const ResidentList: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [showAddResidentModal, setShowAddResidentModal] = useState(false);
 
+  //   const handlefetchResident = async () => {
+  //   try {
+  //     const response = await axois.get(
+  //       "https://strapi.ksh.thewmad.info/api/curriculum-program-levels?filters[program_level][program_level_name][$eq]=Level%201&filters[curriculum][end_date][$lte]=2025-12-31&populate[residents][populate]=profile_img_url&populate=*",
+  //        {
+  //       headers: {
+  //           'Content-Type': 'application/json',
+  //           'Authorization': `Bearer ${token}`
+  //       }
+  //     }
+  //     );
+  //     const data = response.data;
+  //     console.log("Fetched residents:", data);
+  //     setResidents(data);
+  //   } catch (error) {
+  //     console.error("Error fetching residents:", error);
+  //   }
+  // };
+
+  useEffect(() => {
+    // handlefetchResident();
+  }, []);
+
   const [newResidentData, setNewResidentData] = useState({
     name: "",
     age: "",
@@ -123,9 +149,11 @@ const ResidentList: React.FC = () => {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
 
+
   const prevPage = () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
   };
+  
 
   const handleAddResident = () => {
     setShowAddResidentModal(true);
