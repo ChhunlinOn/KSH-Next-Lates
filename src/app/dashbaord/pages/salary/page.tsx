@@ -332,7 +332,7 @@ const TOKEN = process.env.NEXT_PUBLIC_TOKEN;
                     onFocus={() => setShowDropdown(true)}
                     onBlur={() => setTimeout(() => setShowDropdown(false), 100)} // delay to let click register
                     placeholder="Search resident by name"
-                    className="w-full px-4 py-2 border rounded-lg"
+                    className="w-full px-4 py-2 border rounded-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
 
                   {showDropdown && (
