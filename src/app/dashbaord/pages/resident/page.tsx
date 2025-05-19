@@ -4,118 +4,52 @@ import React, { useState,useEffect } from "react";
 import BoxResident from "../../../component/boxResident";
 import DropdownYearResident from "../../../component/dropDownYearResident";
 import { FaPlus, FaTimes, FaSearch } from "react-icons/fa";
-// import axois from "axios";
+import axois from "axios";
+import dotenv from "dotenv";
 
 
 const ResidentList: React.FC = () => {
-  // const token = "";
-  const [residents, setResidents] = useState<any[]>([
-    {
-      id: "1",
-      name: "Sok Dara",
-      date_of_birth: "2005-06-15",
-      image:
-        "https://img.freepik.com/premium-photo/professional-business-woman-cartoon-character-with-glasses-arms-crossed-confidence-pink_996993-57501.jpg",
-    },
-    {
-      id: "2",
-      name: "Kim Lina",
-      date_of_birth: "2006-02-20",
-      image:
-        "https://img.freepik.com/premium-photo/professional-business-woman-cartoon-character-with-glasses-arms-crossed-confidence-pink_996993-57501.jpg",
-    },
-    {
-      id: "3",
-      name: "Chan Sovann",
-      date_of_birth: "2004-11-08",
-      image:
-        "https://img.freepik.com/premium-photo/professional-business-woman-cartoon-character-with-glasses-arms-crossed-confidence-pink_996993-57501.jpg",
-    },
-    {
-      id: "4",
-      name: "Chan Solin",
-      date_of_birth: "2004-11-08",
-      image:
-        "https://img.freepik.com/premium-photo/professional-business-woman-cartoon-character-with-glasses-arms-crossed-confidence-pink_996993-57501.jpg",
-    },
-    {
-      id: "5",
-      name: "Chan Soka",
-      date_of_birth: "2004-11-08",
-      image:
-        "https://img.freepik.com/premium-photo/professional-business-woman-cartoon-character-with-glasses-arms-crossed-confidence-pink_996993-57501.jpg",
-    },
-    {
-      id: "6",
-      name: "Chan Soheang",
-      date_of_birth: "2004-11-08",
-      image:
-        "https://img.freepik.com/premium-photo/professional-business-woman-cartoon-character-with-glasses-arms-crossed-confidence-pink_996993-57501.jpg",
-    },
-    {
-      id: "7",
-      name: "Chan Sopheak",
-      date_of_birth: "2004-11-08",
-      image:
-        "https://img.freepik.com/premium-photo/professional-business-woman-cartoon-character-with-glasses-arms-crossed-confidence-pink_996993-57501.jpg",
-    },
-    {
-      id: "8",
-      name: "Chan Sonit",
-      date_of_birth: "2004-11-08",
-      image:
-        "https://img.freepik.com/premium-photo/professional-business-woman-cartoon-character-with-glasses-arms-crossed-confidence-pink_996993-57501.jpg",
-    },
-    {
-      id: "9",
-      name: "Chan Soer",
-      date_of_birth: "2004-11-08",
-      image:
-        "https://img.freepik.com/premium-photo/professional-business-woman-cartoon-character-with-glasses-arms-crossed-confidence-pink_996993-57501.jpg",
-    },
-    {
-      id: "10",
-      name: "Chan Sotoeng",
-      date_of_birth: "2004-11-08",
-      image:
-        "https://img.freepik.com/premium-photo/professional-business-woman-cartoon-character-with-glasses-arms-crossed-confidence-pink_996993-57501.jpg",
-    },
-    {
-      id: "11",
-      name: "Chan Somey",
-      date_of_birth: "2004-11-08",
-      image:
-        "https://img.freepik.com/premium-photo/professional-business-woman-cartoon-character-with-glasses-arms-crossed-confidence-pink_996993-57501.jpg",
-    },
-  ]);
+  dotenv.config();
+  const api_url = process.env.NEXT_PUBLIC_API_URL; 
+  const token = process.env.NEXT_PUBLIC_TOKEN;
+  console.log("API URL:", api_url);
+  console.log("Token:", token);
+  const [residents, setResidents] = useState<any[]>([]);
 
-  const [selectedYear, setSelectedYear] = useState("");
-  const [type, setType] = useState("1");
+  const [selectedYear, setSelectedYear] = useState("2025");
+  const [type, setType] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [showAddResidentModal, setShowAddResidentModal] = useState(false);
 
-  //   const handlefetchResident = async () => {
-  //   try {
-  //     const response = await axois.get(
-  //       "https://strapi.ksh.thewmad.info/api/curriculum-program-levels?filters[program_level][program_level_name][$eq]=Level%201&filters[curriculum][end_date][$lte]=2025-12-31&populate[residents][populate]=profile_img_url&populate=*",
-  //        {
-  //       headers: {
-  //           'Content-Type': 'application/json',
-  //           'Authorization': `Bearer ${token}`
-  //       }
-  //     }
-  //     );
-  //     const data = response.data;
-  //     console.log("Fetched residents:", data);
-  //     setResidents(data);
-  //   } catch (error) {
-  //     console.error("Error fetching residents:", error);
-  //   }
-  // };
+   const handlefetchResident = async () => {
+  try {
+    let url = "";
 
-  useEffect(() => {
-    // handlefetchResident();
-  }, []);
+    if (type === "all") {
+      url = `${api_url}/beneficiaries`;
+    } else {
+      url = `${api_url}/curriculum-program-levels?filters[program_level][program_level_name][$eq]=Level%20${type}&filters[curriculum][end_date][$lte]=${selectedYear}-12-31&populate[residents][populate]=profile_img_url&populate=*`;
+    }
+
+    const response = await axois.get(url, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    const data = response.data;
+    console.log("Fetched data:", data);
+    setResidents(data.data[0]?.attributes?.residents?.data || data.data);
+  } catch (error) {
+    console.error("Error fetching residents:", error);
+  }
+};
+
+useEffect(() => {
+  handlefetchResident();
+}, [type, selectedYear]);
+
 
   const [newResidentData, setNewResidentData] = useState({
     name: "",
@@ -128,11 +62,11 @@ const ResidentList: React.FC = () => {
   const residentsPerPage = 10;
 
   const filteredResidents = residents.filter((r) => {
-    const matchYear = selectedYear ? r.date_of_birth.startsWith(selectedYear) : true;
+    // const matchYear = selectedYear ? r.attributes.date_of_birth.startsWith(selectedYear) : true;
     const matchName = searchTerm
-      ? r.name.toLowerCase().includes(searchTerm.toLowerCase())
+      ? r.attributes.fullname_english.toLowerCase().includes(searchTerm.toLowerCase())
       : true;
-    return matchYear && matchName;
+    return matchName;
   });
 
   const totalResidents = filteredResidents.length;
@@ -220,7 +154,7 @@ const ResidentList: React.FC = () => {
       className="border border-gray-400 rounded-md w-28 sm:w-32
                  py-2 lg:py-2 px-2 lg:px-3 text-sm lg:text-base"
     >
-      <option value="1">All Level</option>
+      <option value="all">All Level</option>
       <option value="1">Level 1</option>
       <option value="2">Level 2</option>
       <option value="3">Level 3</option>
@@ -268,9 +202,11 @@ const ResidentList: React.FC = () => {
               <BoxResident
                 key={resident.id}
                 id={resident.id}
-                image={resident.image}
-                name={resident.name}
-                dob={resident.date_of_birth}
+                image={resident.attributes.profile_img_url?.data?.attributes?.url
+                                    ? resident.attributes.profile_img_url.data.attributes.url
+                                    : resident.image}
+                name={resident.attributes.fullname_english}
+                dob={resident.attributes.date_of_birth}
               />
             ))
           ) : (
