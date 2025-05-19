@@ -5,14 +5,14 @@ import { FaEye } from 'react-icons/fa';
 import Link from 'next/link';
 import Image from 'next/image';
 
-interface BoxResidentProps {
+interface BoxMedicalProps {
   image: string | null;
   name: string;
   medicalUse: boolean;
   id: string;
 }
 
-const BoxResident: React.FC<BoxResidentProps> = ({ image, name, medicalUse, id }) => {
+const BoxMedical: React.FC<BoxMedicalProps> = ({ image, name, medicalUse, id }) => {
   return (
     <Link
       href={`/dashbaord/pages/medical/medicalInfo`}
@@ -20,7 +20,6 @@ const BoxResident: React.FC<BoxResidentProps> = ({ image, name, medicalUse, id }
     >
       <div className="flex items-center justify-between gap-2 p-4 border border-gray-300 bg-[#F6F6F6] shadow-md rounded-xl sm:p-4 sm:gap-6 hover:shadow-lg hover:bg-gray-100 transition-all duration-200 cursor-pointer">
         
-        {/* Image + Info */}
         <div className="flex items-center gap-4">
           {image ? (
             <Image
@@ -43,7 +42,6 @@ const BoxResident: React.FC<BoxResidentProps> = ({ image, name, medicalUse, id }
           </div>
         </div>
 
-        {/* View Icon */}
         <div className="text-right text-gray-600 text-xs sm:text-sm flex items-center gap-2">
           <FaEye />
           <span className="hidden sm:inline">View</span>
@@ -53,4 +51,4 @@ const BoxResident: React.FC<BoxResidentProps> = ({ image, name, medicalUse, id }
   );
 };
 
-export default BoxResident;
+export default BoxMedical;
