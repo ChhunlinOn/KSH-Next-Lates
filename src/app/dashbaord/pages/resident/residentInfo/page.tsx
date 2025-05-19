@@ -51,49 +51,42 @@ const ResidentDetailPage: React.FC = () => {
   const profileImageUrl = residentData.profile_img_url?.data?.attributes?.formats?.thumbnail?.url || null;
 
   return (
-    <div className="min-h-screen p-8">
-      {/* Title and Buttons */}
-      <div className="w-[80%] mx-auto flex justify-between items-center mb-8 mt-16">
-        <Link href="/dashbaord/pages/resident">
-          <button className="bg-gray-500 text-white px-6 py-2 rounded-lg shadow-md hover:bg-gray-400 transition duration-300">
-            Back
-          </button>
-        </Link>
+    <div className="min-h-screen px-4 sm:px-6 md:px-10 py-8">
+<div className="max-w-screen-lg mx-auto flex justify-between items-center mb-8  gap-4 px-2 overflow-x-auto whitespace-nowrap">
+  <Link href="/dashbaord/pages/resident">
+    <button className="bg-gray-500 text-white px-3 py-2 sm:px-4 sm:py-2 md:px-6 md:py-2 rounded-lg shadow-md hover:bg-gray-400 transition duration-300 text-xs sm:text-sm md:text-base whitespace-nowrap">
+      Back
+    </button>
+  </Link>
+  <div className="flex gap-2 sm:gap-4 whitespace-nowrap">
+    <button className="bg-green-700 text-white px-3 py-2 sm:px-4 sm:py-2 md:px-6 md:py-2 rounded-lg shadow-md hover:bg-green-600 transition duration-300 text-xs sm:text-sm md:text-base whitespace-nowrap">
+      Program
+    </button>
+    <button className="bg-red-700 text-white px-3 py-2 sm:px-4 sm:py-2 md:px-6 md:py-2 rounded-lg shadow-md hover:bg-red-600 transition duration-300 text-xs sm:text-sm md:text-base whitespace-nowrap">
+      Medical
+    </button>
+  </div>
+</div>
 
-        <div className="flex space-x-6">
-          <Link href='/dashbaord/pages/residentChecklist'>
-          <button className="bg-green-700 text-white px-6 py-2 rounded-lg shadow-md hover:bg-green-600 transition duration-300 text-sm sm:text-base">
-            Program
-          </button>
-          </Link>
-          <Link href='/dashbaord/pages/medical' >
-          <button className="bg-red-700 text-white px-6 py-2 rounded-lg shadow-md hover:bg-red-600 transition duration-300 text-sm sm:text-base">
-            Medical
-          </button>
-     </Link>
-        </div>
-      </div>
 
-      {/* Profile Section */}
-      <div className="w-[80%] mx-auto flex justify-center items-center mb-6">
+
+      <div className="max-w-screen-lg mx-auto flex justify-center items-center mb-6">
         {profileImageUrl ? (
           <img
             src={profileImageUrl}
             alt="Profile"
-            className="h-35 w-35 md:h-50 md:w-50 rounded-full object-cover shadow-lg"
+            className="h-32 w-32 md:h-40 md:w-40 rounded-full object-cover shadow-lg"
           />
         ) : (
           <p className="text-xl font-semibold text-gray-600">No Image Available</p>
         )}
       </div>
 
-      {/* Title */}
-      <h1 className="text-2xl md:text-4xl font-bold text-center mb-6 text-gray-800 w-[80%] mx-auto">
+      <h1 className="text-xl md:text-3xl font-bold text-center mb-6 text-gray-800">
         Detail Information of Resident
       </h1>
 
-      {/* Resident Details */}
-      <div className="bg-white w-[80%] mx-auto rounded-lg p-6 shadow-lg border border-gray-200">
+      <div className="bg-white w-full max-w-screen-lg mx-auto rounded-lg p-6 shadow-lg border border-gray-200">
         <ResidentBoxInfo name="Full Name" value={residentData.fullname_english} />
         <ResidentBoxInfo name="Gender" value={residentData.gender} />
         <ResidentBoxInfo name="Type Of Disability" value={residentData.type_of_disability} />
@@ -104,23 +97,19 @@ const ResidentDetailPage: React.FC = () => {
         <ResidentBoxInfo name="Start Date" value={residentData.start_date} />
         <ResidentBoxInfo name="End Date" value={residentData.end_date} />
 
-        {/* Show custom infos */}
         {customInfos.map((info, index) => (
           <ResidentBoxInfo key={index} name={info.name} value={info.value} />
         ))}
       </div>
 
-      {/* Add Custom Info Section */}
       <div
         onClick={handleOpenModal}
-        className="flex items-center justify-center gap-2 p-4 bg-white rounded-lg shadow cursor-pointer border border-dashed border-gray-400 hover:bg-gray-50 mt-5 w-[80%] mx-auto"
+        className="max-w-screen-lg mx-auto mt-5 flex items-center justify-center gap-2 p-4 bg-white rounded-lg shadow cursor-pointer border border-dashed border-gray-400 hover:bg-gray-50"
       >
         <FaPlus className="text-green-600" />
         <span className="text-sm font-medium text-green-600">Add Custom Info</span>
       </div>
 
-
-      {/* Modal */}
       {showAddResidentModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-2 sm:px-4">
           <div className="relative w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl p-6 bg-white rounded-2xl shadow-2xl">
@@ -155,10 +144,9 @@ const ResidentDetailPage: React.FC = () => {
               <button
                 onClick={handleCloseModal}
                 className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-5 py-2 rounded-md w-full sm:w-auto flex items-center justify-center gap-2"
-              >                  <FaTimes className="text-sm" />
-
+              >
+                <FaTimes className="text-sm" />
                 Cancel
-                
               </button>
               <button
                 onClick={handleAddInfo}

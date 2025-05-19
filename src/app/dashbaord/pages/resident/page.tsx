@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState,useEffect } from "react";
@@ -6,7 +5,6 @@ import BoxResident from "../../../component/boxResident";
 import DropdownYearResident from "../../../component/dropDownYearResident";
 import { FaPlus, FaTimes, FaSearch } from "react-icons/fa";
 // import axois from "axios";
-
 
 
 const ResidentList: React.FC = () => {
@@ -233,16 +231,21 @@ const ResidentList: React.FC = () => {
 </div>
 
 <div className="flex flex-nowrap items-center gap-2 w-full lg:w-auto">
-  <input
-    type="text"
-    placeholder="Search by resident name"
-    value={searchName}
-    onChange={(e) => setSearchName(e.target.value)}
-    onKeyDown={handleKeyDown}
-    className="border border-gray-400 rounded-md flex-grow min-w-0
-               py-2 lg:py-2 px-2 lg:px-3 text-sm lg:text-base
-               focus:outline-none focus:ring-2 focus:ring-green-500"
-  />
+<input
+  type="text"
+  placeholder="Search by resident name"
+  value={searchName}
+  onChange={(e) => {
+    const value = e.target.value;
+    setSearchName(value);
+    setCurrentPage(1);       
+    setSearchTerm(value.trim()); 
+  }}
+  className="border border-gray-400 rounded-md flex-grow min-w-0
+             py-2 lg:py-2 px-2 lg:px-3 text-sm lg:text-base
+             focus:outline-none focus:ring-2 focus:ring-green-500"
+/>
+
   <button
     onClick={handleSearch}
     className="bg-green-700 hover:bg-green-800 text-white
@@ -254,12 +257,6 @@ const ResidentList: React.FC = () => {
   </button>
 </div>
 </div>
-
-
-
-
-
-
 
         <h2 className="text-center text-xl sm:text-2xl md:text-3xl font-bold text-green-800 mb-6">
           Residents
