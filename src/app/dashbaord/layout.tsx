@@ -1,7 +1,7 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { redirect } from "next/navigation"
-import { getSession } from "../action/auth"
+// import { getSession } from "../action/auth"
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { KshSidebar } from "../component/ksh-sidebar"
 import { MobileHeader } from "../component/mobile-header"
@@ -18,12 +18,12 @@ export default async function DashboardLayout({
   children: React.ReactNode
 }>) {
   // Check authentication at the layout level
-  const session = await getSession()
+  // const session = await getSession()
 
-  // If no session, redirect to login
-  if (!session) {
-    redirect("/login")
-  }
+  // // If no session, redirect to login
+  // if (!session) {
+  //   redirect("/login")
+  // }
 
   return (
     <SidebarProvider defaultOpen={true}>

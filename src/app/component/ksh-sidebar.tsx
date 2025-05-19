@@ -12,8 +12,9 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar"
 import { User, LogOut, Settings, HelpCircle } from 'lucide-react'
-import { logout } from "../action/auth"
+// import { logout } from "../action/auth"
 import { useRouter, usePathname } from "next/navigation"
+import path from "path"
 
 export function KshSidebar() {
   const router = useRouter()
@@ -27,28 +28,40 @@ export function KshSidebar() {
   // Main navigation items with image icons
   const mainNavItems = [
     {
-      name: "Dashboard",
+      name: "Residents",
       imageSrc: "/resident_5e1d62f6a2.png",
-      path: "/dashbaord",
-      active: isActive("/dashbaord"),
+      path: "/dashbaord/pages/resident",
+      active: isActive("/dashbaord/pages/resident"),
     },
     {
-      name: "Calendar",
+      name: "Medical",
       imageSrc: "/resident_5e1d62f6a2.png",
-      path: "/dashboard/calendar",
-      active: isActive("/dashboard/calendar"),
+      path: "/dashbaord/pages/medical",
+      active: isActive("/dashbaord/pages/medical"),
     },
     {
-      name: "Messages",
+      name: "Programs",
       imageSrc: "/resident_5e1d62f6a2.png",
-      path: "/dashboard/messages",
-      active: isActive("/dashboard/messages"),
+      path: "/dashbaord/pages/program",
+      active: isActive("/dashbaord/pages/program"),
     },
+    {
+      name: "Assessment",
+      imageSrc: "/resident_5e1d62f6a2.png",
+      path: "/dashbaord/pages/assessment",
+      active: isActive("/dashbaord/pages/assessment"),
+    },
+    {
+      name: "salary",
+      imageSrc: "/resident_5e1d62f6a2.png",
+      path: "/dashbaord/pages/salary",
+      active: isActive("/dashbaord/pages/salary"),
+    }
   ]
 
-  const handleSignOut = async () => {
-    await logout()
-  }
+  // const handleSignOut = async () => {
+  //   await logout()
+  // }
 
   const navigateTo = (path: string) => {
     router.push(path)
@@ -90,7 +103,9 @@ export function KshSidebar() {
                         className="object-fit"
                       />
                     </div>
-                    <span className="text-xl font-semibold truncate">{item.name}</span>
+                    <span className="text-xl font-semibold truncate">
+                    {item.name}
+                  </span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -115,7 +130,7 @@ export function KshSidebar() {
               </SidebarMenuButton>
             </SidebarMenuItem>
 
-            <SidebarMenuItem>
+            {/* <SidebarMenuItem>
               <SidebarMenuButton
                 onClick={() => navigateTo("/dashboard/settings")}
                 isActive={isActive("/dashboard/settings")}
@@ -127,7 +142,7 @@ export function KshSidebar() {
                 <Settings className="h-5 w-5 mr-3" />
                 <span className="text-base">Settings</span>
               </SidebarMenuButton>
-            </SidebarMenuItem>
+            </SidebarMenuItem> */}
 
             <SidebarMenuItem>
               <SidebarMenuButton
@@ -147,7 +162,7 @@ export function KshSidebar() {
 
             <SidebarMenuItem>
               <SidebarMenuButton
-                onClick={handleSignOut}
+                // onClick={handleSignOut}
                 className="text-red-600 hover:text-red-700 hover:bg-[#ebe3d1] py-3 px-4"
               >
                 <LogOut className="h-5 w-5 mr-3" />

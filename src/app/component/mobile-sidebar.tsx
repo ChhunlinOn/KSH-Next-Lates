@@ -3,26 +3,45 @@
 import { Users, BookOpen, ClipboardList, BarChart2, Heart, Zap, User, LogOut } from "lucide-react"
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
 import { useSidebar } from "@/components/ui/sidebar"
-import { logout } from "@/app/action/auth"
-import { useRouter } from "next/navigation"
+// import { logout } from "@/app/action/auth"
+import { useRouter, usePathname } from "next/navigation"
 import Image from "next/image"
 export function MobileSidebar() {
   const { openMobile, setOpenMobile } = useSidebar()
   const router = useRouter()
+  const pathname = usePathname()
+
+  const isActive = (path: string) => {
+    return pathname === path
+  }
 
   const menuItems = [
-    { name: "Residents", Img: "/resident_5e1d62f6a2.png", active: true, href: "/dashboard/residents" },
-    { name: "Programs",  Img: "/resident_5e1d62f6a2.png", href: "/dashboard/programs" },
-    { name: "Assessment",  Img: "/resident_5e1d62f6a2.png", href: "/dashboard/assessment" },
-    { name: "Reporting", Img: "/resident_5e1d62f6a2.png", href: "/dashboard/reporting" },
-    { name: "Medical",  Img: "/resident_5e1d62f6a2.png", href: "/dashboard/medical" },
-    { name: "Generate",  Img: "/resident_5e1d62f6a2.png", href: "/dashboard/generate" },
-    
+    { name: "Residents", Img: "/resident_5e1d62f6a2.png", href: "/dashbaord/pages/resident" },
+    {
+      name: "Medical",
+      Img: "/resident_5e1d62f6a2.png",
+      href: "/dashbaord/pages/medical",
+    },
+    {
+      name: "Programs",
+      Img: "/resident_5e1d62f6a2.png",
+      href: "/dashbaord/pages/program",
+    },
+    {
+      name: "Assessment",
+      Img: "/resident_5e1d62f6a2.png",
+      href: "/dashbaord/pages/assessment",
+    },
+    {
+      name: "salary",
+      Img: "/resident_5e1d62f6a2.png",
+      href: "/dashbaord/pages/salary",
+    }
   ]
 
   const handleSignOut = async () => {
     setOpenMobile(false)
-    await logout()
+    // await logout()
   }
 
   const handleNavigation = (href: string) => {
@@ -35,7 +54,7 @@ export function MobileSidebar() {
       <SheetContent
         side="left"
         className="w-[250px] p-0 md:hidden [&>button]:border [&>button]:border-gray-600 [&>button]:rounded-[5px] bg-[#f5f0e0]"
-        >
+      >
         {/* Add SheetTitle for accessibility */}
         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
 
@@ -50,21 +69,20 @@ export function MobileSidebar() {
                 <button
                   key={item.name}
                   onClick={() => handleNavigation(item.href)}
-                  className={`flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-left ${
-                    item.active
+                  className={`flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-left ${isActive(item.href)
                       ? "!bg-green-700 !text-white"
                       : "hover:bg-[#f5f1e4] text-gray-700 hover:text-green-800"
-                  }`}
+                    }`}
                 >
                   <div className="w-20 h-13 mr-6 flex-shrink-0 group-hover:scale-105 transition-transform duration-200">
-                                        <Image
-                                          src={item.Img || "/placeholder.svg"}
-                                          alt={`${item.name} icon`}
-                                          width={80}
-                                          height={80}
-                                          className="object-fit"
-                                        />
-                                      </div>
+                    <Image
+                      src={item.Img || "/placeholder.svg"}
+                      alt={`${item.name} icon`}
+                      width={80}
+                      height={80}
+                      className="object-fit"
+                    />
+                  </div>
                   <span>{item.name}</span>
                 </button>
               ))}
