@@ -5,6 +5,7 @@ import DropdownYearResident from '../../../component/dropDownYearResident';
 import { FaPlus } from 'react-icons/fa';
 import { FaTimes } from "react-icons/fa";
 import { FaSearch } from "react-icons/fa";
+import dotenv from 'dotenv';
 // import { console } from 'inspector';
 
 // interface ResidentListProps {
@@ -16,6 +17,12 @@ import { FaSearch } from "react-icons/fa";
 // }
 
 const ResidentList: React.FC = () => {
+
+dotenv.config();
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const TOKEN = process.env.NEXT_PUBLIC_TOKEN;
+  console.log('API_URL:', API_URL);
+  console.log('TOKEN:', TOKEN);
   const [input, setInput] = useState('');
   const [selected, setSelected] = useState<typeof residents[0] | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -100,11 +107,11 @@ const ResidentList: React.FC = () => {
   };
 
   const fectchResident = async () => {
-    const response = await fetch('https://strapi.ksh.thewmad.info/api/curriculum-program-levels?filters[program_level][program_level_name][$eq]=Level%201&filters[curriculum][end_date][$lte]=2025-12-31&populate[residents][populate]=profile_img_url&populate=*', {
+    const response = await fetch(`${API_URL}/curriculum-program-levels?filters[program_level][program_level_name][$eq]=Level%201&filters[curriculum][end_date][$lte]=2025-12-31&populate[residents][populate]=profile_img_url&populate=*`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiaWF0IjoxNzQ3NjIxODUzLCJleHAiOjE3NTAyMTM4NTN9.wEIAkke2U3RPEyYR4zFzClZq4AUz4DbkSho6-SjA0gM'}`,
+        Authorization: `Bearer ${TOKEN}`,
       },
     });
     if (!response.ok) {
