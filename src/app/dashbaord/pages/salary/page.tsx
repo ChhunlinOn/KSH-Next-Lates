@@ -1,10 +1,11 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import BoxSalary from '../../../component/boxSalary';
 import DropdownYearResident from '../../../component/dropDownYearResident';
 import { FaPlus } from 'react-icons/fa';
 import { FaTimes } from "react-icons/fa";
 import { FaSearch } from "react-icons/fa";
+// import { console } from 'inspector';
 
 // interface ResidentListProps {
 //   session: {
@@ -15,6 +16,10 @@ import { FaSearch } from "react-icons/fa";
 // }
 
 const ResidentList: React.FC = () => {
+  const [input, setInput] = useState('');
+  const [selected, setSelected] = useState<typeof residents[0] | null>(null);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [search, setSearch] = useState<any[]>([]);
   const [residents, setResidents] = useState<any[]>([
     {
       id: '1',
@@ -35,48 +40,85 @@ const ResidentList: React.FC = () => {
       image: 'https://img.freepik.com/premium-photo/professional-business-woman-cartoon-character-with-glasses-arms-crossed-confidence-pink_996993-57501.jpg',
     },
     {
-        id: '4',
-        name: 'Chan Sovann',
-        date_of_birth: '2004-11-08',
-        image: 'https://img.freepik.com/premium-photo/professional-business-woman-cartoon-character-with-glasses-arms-crossed-confidence-pink_996993-57501.jpg',
-      },    {
-        id: '5',
-        name: 'Chan Sovann',
-        date_of_birth: '2004-11-08',
-        image: 'https://img.freepik.com/premium-photo/professional-business-woman-cartoon-character-with-glasses-arms-crossed-confidence-pink_996993-57501.jpg',
-      },    {
-        id: '6',
-        name: 'Chan Sovann',
-        date_of_birth: '2004-11-08',
-        image: 'https://img.freepik.com/premium-photo/professional-business-woman-cartoon-character-with-glasses-arms-crossed-confidence-pink_996993-57501.jpg',
-      },
-      {
-        id: '7',
-        name: 'Chan Sovann',
-        date_of_birth: '2004-11-08',
-        image: 'https://img.freepik.com/premium-photo/professional-business-woman-cartoon-character-with-glasses-arms-crossed-confidence-pink_996993-57501.jpg',
-      },    {
-        id: '8',
-        name: 'Chan Sovann',
-        date_of_birth: '2004-11-08',
-        image: 'https://img.freepik.com/premium-photo/professional-business-woman-cartoon-character-with-glasses-arms-crossed-confidence-pink_996993-57501.jpg',
-      },    {
-        id: '9',
-        name: 'Chan Sovann',
-        date_of_birth: '2004-11-08',
-        image: 'https://img.freepik.com/premium-photo/professional-business-woman-cartoon-character-with-glasses-arms-crossed-confidence-pink_996993-57501.jpg',
-      },    {
-        id: '10',
-        name: 'Chan Sovann',
-        date_of_birth: '2004-11-08',
-        image: 'https://img.freepik.com/premium-photo/professional-business-woman-cartoon-character-with-glasses-arms-crossed-confidence-pink_996993-57501.jpg',
-      },    {
-        id: '11',
-        name: 'Chan Sovann',
-        date_of_birth: '2004-11-08',
-        image: 'https://img.freepik.com/premium-photo/professional-business-woman-cartoon-character-with-glasses-arms-crossed-confidence-pink_996993-57501.jpg',
-      },
+      id: '4',
+      name: 'Chan Sovann',
+      date_of_birth: '2004-11-08',
+      image: 'https://img.freepik.com/premium-photo/professional-business-woman-cartoon-character-with-glasses-arms-crossed-confidence-pink_996993-57501.jpg',
+    }, {
+      id: '5',
+      name: 'Chan Sovann',
+      date_of_birth: '2004-11-08',
+      image: 'https://img.freepik.com/premium-photo/professional-business-woman-cartoon-character-with-glasses-arms-crossed-confidence-pink_996993-57501.jpg',
+    }, {
+      id: '6',
+      name: 'Chan Sovann',
+      date_of_birth: '2004-11-08',
+      image: 'https://img.freepik.com/premium-photo/professional-business-woman-cartoon-character-with-glasses-arms-crossed-confidence-pink_996993-57501.jpg',
+    },
+    {
+      id: '7',
+      name: 'Chan Sovann',
+      date_of_birth: '2004-11-08',
+      image: 'https://img.freepik.com/premium-photo/professional-business-woman-cartoon-character-with-glasses-arms-crossed-confidence-pink_996993-57501.jpg',
+    }, {
+      id: '8',
+      name: 'Chan Sovann',
+      date_of_birth: '2004-11-08',
+      image: 'https://img.freepik.com/premium-photo/professional-business-woman-cartoon-character-with-glasses-arms-crossed-confidence-pink_996993-57501.jpg',
+    }, {
+      id: '9',
+      name: 'Chan Sovann',
+      date_of_birth: '2004-11-08',
+      image: 'https://img.freepik.com/premium-photo/professional-business-woman-cartoon-character-with-glasses-arms-crossed-confidence-pink_996993-57501.jpg',
+    }, {
+      id: '10',
+      name: 'Chan Sovann',
+      date_of_birth: '2004-11-08',
+      image: 'https://img.freepik.com/premium-photo/professional-business-woman-cartoon-character-with-glasses-arms-crossed-confidence-pink_996993-57501.jpg',
+    }, {
+      id: '11',
+      name: 'Chan Sovann',
+      date_of_birth: '2004-11-08',
+      image: 'https://img.freepik.com/premium-photo/professional-business-woman-cartoon-character-with-glasses-arms-crossed-confidence-pink_996993-57501.jpg',
+    },
   ]);
+
+  const getFilteredOptions = () => {
+    if (input.trim() === '') return search;
+
+    return search.filter((resident) =>
+      resident.attributes.fullname_english.toLowerCase().includes(input.trim().toLowerCase())
+    );
+  };
+  const filteredOptions = getFilteredOptions();
+
+  const handleSelect = (resident: typeof search[0]) => {
+    console.log('Selected resident:', resident);
+    setInput(resident.attributes.fullname_english);
+    setSelected(resident); // now storing the full object
+    setShowDropdown(false);
+  };
+
+  const fectchResident = async () => {
+    const response = await fetch('https://strapi.ksh.thewmad.info/api/curriculum-program-levels?filters[program_level][program_level_name][$eq]=Level%201&filters[curriculum][end_date][$lte]=2025-12-31&populate[residents][populate]=profile_img_url&populate=*', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiaWF0IjoxNzQ3NjIxODUzLCJleHAiOjE3NTAyMTM4NTN9.wEIAkke2U3RPEyYR4zFzClZq4AUz4DbkSho6-SjA0gM'}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch data');
+    }
+    const data = await response.json();
+    console.log('Fetched data:', data.data[0].attributes.residents.data[0].attributes);
+    setSearch(data.data[0].attributes.residents.data);
+  };
+
+  useEffect(() => {
+    fectchResident();
+  }, []);
+
 
   const [selectedYear, setSelectedYear] = useState('');
   const [type, setType] = useState('1');
@@ -84,9 +126,9 @@ const ResidentList: React.FC = () => {
   const [showAddResidentModal, setShowAddResidentModal] = useState(false);
 
   const [newResidentData, setNewResidentData] = useState({
-    name: '',
-    age: '',
-    image: '',
+    search: '',
+    salary: '',
+    date: '',
   });
 
   const residentsPerPage = 10;
@@ -125,16 +167,16 @@ const ResidentList: React.FC = () => {
   };
 
   const handleSubmit = () => {
-    if (newResidentData.name && newResidentData.age && newResidentData.image) {
+    if (newResidentData.search && newResidentData.salary && newResidentData.date) {
       const newResident = {
         id: (residents.length + 1).toString(),
-        name: newResidentData.name,
-        date_of_birth: newResidentData.age, 
-        image: newResidentData.image,
+        search: newResidentData.search,
+        salary: newResidentData.salary,
+        date: newResidentData.date,
       };
 
       setResidents([...residents, newResident]);
-      setShowAddResidentModal(false); 
+      setShowAddResidentModal(false);
     } else {
       alert('Please fill out all fields!');
     }
@@ -149,7 +191,7 @@ const ResidentList: React.FC = () => {
       handleSearch();
     }
   };
-const [searchName, setSearchName] = useState("");
+  const [searchName, setSearchName] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
   return (
@@ -161,26 +203,26 @@ const [searchName, setSearchName] = useState("");
         </h2>
 
         <div className="flex flex-nowrap items-center gap-2 w-full lg:w-auto mb-4">
-  <input
-    type="text"
-    placeholder="Search by resident name"
-    value={searchName}
-    onChange={(e) => setSearchName(e.target.value)}
-    onKeyDown={handleKeyDown}
-    className="border border-gray-400 rounded-md flex-grow min-w-0
+          <input
+            type="text"
+            placeholder="Search by resident name"
+            value={searchName}
+            onChange={(e) => setSearchName(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="border border-gray-400 rounded-md flex-grow min-w-0
                py-2 lg:py-2 px-2 lg:px-3 text-sm lg:text-base
                focus:outline-none focus:ring-2 focus:ring-green-500"
-  />
-  <button
-    onClick={handleSearch}
-    className="bg-green-700 hover:bg-green-800 text-white
+          />
+          <button
+            onClick={handleSearch}
+            className="bg-green-700 hover:bg-green-800 text-white
                rounded-md flex items-center gap-2 whitespace-nowrap
                min-w-[80px] py-2 lg:py-2 px-3 lg:px-4 text-sm lg:text-base"
-  >
-    <FaSearch />
-    Search
-  </button>
-</div>
+          >
+            <FaSearch />
+            Search
+          </button>
+        </div>
         {/* <div className="flex justify-between items-center gap-4 mt-24 mb-5">
           <DropdownYearResident
             selectedYear={selectedYear}
@@ -206,24 +248,24 @@ const [searchName, setSearchName] = useState("");
           </div>
         </div> */}
 
-        
+
 
         <div className="flex flex-col gap-5 object-cover">
-        {currentResidents.length > 0 ? (
-  currentResidents.map((resident) => (
-    <BoxSalary
-      key={resident.id} 
-      id={resident.id}
-      image={resident.image}
-      name={resident.name}
-      age={0}
-    />
-  ))
-) : (
-  <div className="col-span-full text-center text-gray-500 font-medium">
-    No residents found.
-  </div>
-)}
+          {currentResidents.length > 0 ? (
+            currentResidents.map((resident) => (
+              <BoxSalary
+                key={resident.id}
+                id={resident.id}
+                image={resident.image}
+                name={resident.name}
+                age={0}
+              />
+            ))
+          ) : (
+            <div className="col-span-full text-center text-gray-500 font-medium">
+              No residents found.
+            </div>
+          )}
 
         </div>
 
@@ -231,9 +273,8 @@ const [searchName, setSearchName] = useState("");
           <button
             onClick={prevPage}
             disabled={currentPage === 1}
-            className={`px-4 py-2 rounded-md text-white ${
-              currentPage === 1 ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#207137]'
-            }`}
+            className={`px-4 py-2 rounded-md text-white ${currentPage === 1 ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#207137]'
+              }`}
           >
             Previous
           </button>
@@ -243,9 +284,8 @@ const [searchName, setSearchName] = useState("");
           <button
             onClick={nextPage}
             disabled={currentPage === totalPages}
-            className={`px-4 py-2 rounded-md text-white ${
-              currentPage === totalPages ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#207137]'
-            }`}
+            className={`px-4 py-2 rounded-md text-white ${currentPage === totalPages ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#207137]'
+              }`}
           >
             Next
           </button>
@@ -258,66 +298,126 @@ const [searchName, setSearchName] = useState("");
           <FaPlus className="text-green-600" />
           <span className="text-sm font-medium text-green-600">Add New Resident</span>
         </div>
- 
 
-{showAddResidentModal && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-2 sm:px-4">
-    <div className="relative w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl p-6 bg-white rounded-2xl shadow-2xl">
-      <button
-        onClick={handleCloseModal}
-        className="absolute top-3 right-4 text-2xl text-gray-500 hover:text-red-500"
-      >
-        &times;
-      </button>
-      <h3 className="text-2xl font-bold text-center mb-6 text-gray-800">Add New Resident</h3>
-      
-      <div className="flex flex-col gap-4">
-        <input
-          type="text"
-          name="name"
-          placeholder="Enter Name"
-          value={newResidentData.name}
-          onChange={handleInputChange}
-          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-        />
-        <input
-          type="number"
-          name="age"
-          placeholder="Enter Age"
-          value={newResidentData.age}
-          onChange={handleInputChange}
-          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-        />
-        <input
-          type="text"
-          name="image"
-          placeholder="Enter Image URL"
-          value={newResidentData.image}
-          onChange={handleInputChange}
-          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-        />
-      </div>
 
-      <div className="flex flex-col sm:flex-row justify-between gap-4 mt-6">
-    
-      <button
-  onClick={handleCloseModal}
-  className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-5 py-2 rounded-md w-full sm:w-auto flex items-center justify-center gap-2"
->
-  <FaTimes className="text-sm" />
-  Cancel
-</button>
+        {showAddResidentModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-2 sm:px-4">
+            <div className="relative w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl p-6 bg-white rounded-2xl shadow-2xl">
+              <button
+                onClick={handleCloseModal}
+                className="absolute top-3 right-4 text-2xl text-gray-500 hover:text-red-500"
+              >
+                &times;
+              </button>
+              <h3 className="text-2xl font-bold text-center mb-6 text-gray-800">Add New Resident</h3>
 
-        <button
-          onClick={handleSubmit}
-          className="bg-green-800 hover:bg-green-700 text-white px-5 py-2 rounded-md w-full sm:w-auto"
-        >
-          Add
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+              <div className="flex flex-col gap-4">
+                <div className="relative">
+                  <input
+                    type="text"
+                    id="resident-search"
+                    value={input}
+                    onChange={(e) => {
+                      setInput(e.target.value);
+                      setShowDropdown(true);
+                      setSelected(null);
+                    }}
+                    onFocus={() => setShowDropdown(true)}
+                    onBlur={() => setTimeout(() => setShowDropdown(false), 100)} // delay to let click register
+                    placeholder="Search resident by name"
+                    className="w-full px-4 py-2 border rounded-lg"
+                  />
+
+                  {showDropdown && (
+                    <ul className="absolute w-full bg-white border rounded shadow z-10 max-h-[300px] overflow-y-auto mt-1">
+                      {filteredOptions.length > 0 ? (
+                        filteredOptions.map((resident, index) => (
+                          <li
+                            key={index}
+                            onMouseDown={() => handleSelect(resident)}
+                            className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                          >
+                            {resident.attributes.profile_img_url?.data?.attributes?.url || resident.image ? (
+                              <img
+                                src={
+                                  resident.attributes.profile_img_url?.data?.attributes?.url
+                                    ? resident.attributes.profile_img_url.data.attributes.url
+                                    : resident.image
+                                }
+                                alt={resident.attributes.fullname_english || resident.name || "Resident"}
+                                className="h-8 w-8 rounded-full object-cover bg-gray-200"
+                              />
+                            ) : null}
+                            <div>
+                              <p className="font-medium">{resident.attributes.fullname_english}</p>
+                              <p className="text-sm text-gray-500">🎂 {resident.attributes.date_of_birth}</p>
+                            </div>
+                          </li>
+                        ))
+                      ) : (
+                        <li className="px-4 py-2 text-gray-500">❌ No resident found</li>
+                      )}
+                    </ul>
+                  )}
+                </div>
+                {selected && (
+                  <div className="flex items-center gap-4 p-4 border rounded bg-gray-50">
+                    {selected.attributes.profile_img_url?.data?.attributes?.url || selected.image ? (
+                      <img
+                        src={
+                          selected.attributes.profile_img_url?.data?.attributes?.url
+                            ? selected.attributes.profile_img_url.data.attributes.url
+                            : selected.image
+                        }
+                        alt={selected.attributes.fullname_english || selected.name || "Resident"}
+                        className="h-12 w-12 rounded-full object-cover"
+                      />
+                    ) : null}
+                    <div>
+                      <p className="text-lg font-semibold">{selected.attributes.fullname_english}</p>
+                      <p className="text-sm text-gray-600">🎂 {selected.attributes.date_of_birth}</p>
+                    </div>
+                  </div>
+                )}
+
+                <input
+                  type="number"
+                  name="salary"
+                  placeholder="Enter Salary"
+                  value={newResidentData.salary}
+                  onChange={handleInputChange}
+                  className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+                <input
+                  type="date"
+                  name="date"
+                  placeholder="Enter date"
+                  value={newResidentData.date}
+                  onChange={handleInputChange}
+                  className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+              </div>
+
+              <div className="flex flex-col sm:flex-row justify-between gap-4 mt-6">
+
+                <button
+                  onClick={handleCloseModal}
+                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-5 py-2 rounded-md w-full sm:w-auto flex items-center justify-center gap-2"
+                >
+                  <FaTimes className="text-sm" />
+                  Cancel
+                </button>
+
+                <button
+                  onClick={handleSubmit}
+                  className="bg-green-800 hover:bg-green-700 text-white px-5 py-2 rounded-md w-full sm:w-auto"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
       </div>
     </div>
