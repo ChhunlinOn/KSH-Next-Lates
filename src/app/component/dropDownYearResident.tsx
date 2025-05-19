@@ -3,7 +3,7 @@
 
 import React from 'react';
 
-const staticYears = ['2021', '2022', '2023', '2024'];
+const staticYears = ['2021', '2022', '2023', '2024','2025'];
 
 type DropdownYearResidentProps = {
   selectedYear: string;
@@ -31,7 +31,6 @@ const DropdownYearResident = ({
         onChange={handleYearChange}
         className={`p-2 border border-gray-400 rounded-md w-28 sm:w-32 ${className}`}
       >
-        <option value="">Select Year</option>
         {staticYears.map((year) => (
           <option key={year} value={year}>
             {year}
