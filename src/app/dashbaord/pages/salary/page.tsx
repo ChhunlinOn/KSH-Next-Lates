@@ -203,12 +203,11 @@ const TOKEN = process.env.NEXT_PUBLIC_TOKEN;
 
   return (
     <div className="flex justify-center w-full">
-      <div className="w-[95%] max-w-screen-xl">
+      <div className="w-[95%] max-w-screen-xl min-h-screen bg-gradient-to-b py-10 px-6 relative">
 
-        <h2 className="text-center text-xl sm:text-2xl md:text-3xl font-bold text-green-800 mb-6">
-          Salary
-        </h2>
-
+      <h1 className="text-xl sm:text-3xl md:text-4xl font-extrabold text-center text-green-800 mb-6 drop-shadow-md">
+        Salary
+      </h1>
         <div className="flex flex-nowrap items-center gap-2 w-full lg:w-auto mb-4">
           <input
             type="text"
@@ -230,32 +229,7 @@ const TOKEN = process.env.NEXT_PUBLIC_TOKEN;
             Search
           </button>
         </div>
-        {/* <div className="flex justify-between items-center gap-4 mt-24 mb-5">
-          <DropdownYearResident
-            selectedYear={selectedYear}
-            setSelectedYear={setSelectedYear}
-          />
-          <div className="flex items-center gap-2">
-            <label htmlFor="type" className="text-sm sm:text-base font-semibold">
-              Level
-            </label>
-            <select
-              id="type"
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-              className="p-2 border border-gray-400 rounded-md w-28 sm:w-32"
-            >
-              <option value="1">All Level</option>
-              <option value="1">Level 1</option>
-              <option value="2">Level 2</option>
-              <option value="3">Level 3</option>
-              <option value="4">Level 4</option>
-              <option value="5-6">Level 5</option>
-            </select>
-          </div>
-        </div> */}
-
-
+ 
 
         <div className="flex flex-col gap-5 object-cover">
           {currentResidents.length > 0 ? (
