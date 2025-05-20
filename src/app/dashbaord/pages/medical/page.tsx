@@ -151,7 +151,10 @@ const MedicalList: React.FC = () => {
   return (
     <div className="flex justify-center w-full">
       <div className="w-[95%] max-w-screen-xl">
-        <div className="flex flex-nowrap items-center gap-2 w-full lg:w-auto">
+      <h1 className="text-center text-3xl font-bold text-green-800 my-6">
+          Medicals
+        </h1>
+        <div className="flex flex-nowrap items-center gap-2 w-full lg:w-auto mb-4">
         <input
   type="text"
   placeholder="Search by resident name"
@@ -175,9 +178,7 @@ const MedicalList: React.FC = () => {
           </button>
         </div>
 
-        <h2 className="text-center text-2xl font-bold text-green-800 my-6">
-          Medicals
-        </h2>
+     
 
         <div className="flex flex-col gap-5">
           {currentResidents.length > 0 ? (
