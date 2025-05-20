@@ -149,11 +149,12 @@ const MedicalList: React.FC = () => {
   };
 
   return (
-    <div className="flex justify-center w-full">
-      <div className="w-[95%] max-w-screen-xl">
-      <h1 className="text-center text-3xl font-bold text-green-800 my-6">
-          Medicals
-        </h1>
+    <div className="flex justify-center w-full ">
+      <div className="w-[95%] max-w-screen-xl min-h-screen bg-gradient-to-b py-10 px-6 relative">
+      <h1 className="text-xl sm:text-3xl md:text-4xl font-extrabold text-center text-green-800 mb-6 drop-shadow-md">
+        Medical 
+      </h1>
+
         <div className="flex flex-nowrap items-center gap-2 w-full lg:w-auto mb-4">
         <input
   type="text"
@@ -171,8 +172,9 @@ const MedicalList: React.FC = () => {
 />
           <button
             onClick={handleSearch}
-            className="bg-green-700 hover:bg-green-800 text-white rounded-md flex items-center gap-2 py-2 px-4 text-sm"
-          >
+            className="bg-green-700 hover:bg-green-800 text-white
+            rounded-md flex items-center gap-2 whitespace-nowrap
+            min-w-[80px] py-2 lg:py-2 px-3 lg:px-4 text-sm lg:text-base"          >
             <FaSearch />
             Search
           </button>
