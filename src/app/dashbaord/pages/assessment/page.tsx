@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { FaWpforms, FaEdit, FaSave, FaTimes, FaPlus, FaTrash } from 'react-icons/fa';
 import { MdArrowForward } from 'react-icons/md';
+import { FaSearch} from 'react-icons/fa'
 
 const initialAssessments = [
   {
@@ -35,6 +36,9 @@ const Assessment: React.FC = () => {
     title: '',
     imageUrl: '',
   });
+    const [searchName, setSearchName] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
 
   const handleEdit = (id: number, current: { id?: number; title: string; google_form_url: string }) => {
     setEditId(id);
@@ -57,13 +61,42 @@ const Assessment: React.FC = () => {
   };
 
   const handleDelete = (id: number) => {
-    // Show confirmation alert before deleting
     const confirmDelete = window.confirm('Are you sure you want to delete this assessment?');
     if (confirmDelete) {
       setAssessments((prev) => prev.filter((item) => item.id !== id));
       setEditId(null);
     }
   };
+    const handleSearch = () => {
+      setCurrentPage(1);
+      setSearchTerm(searchName.trim());
+    };
+  
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        handleSearch();
+      }
+    };
+    const filteredAssessments = assessments.filter((assessment) =>
+      assessment.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      assessment.google_form_url
+    );
+  
+    const residentsPerPage = 5;
+    const totalPages = Math.ceil(filteredAssessments.length / residentsPerPage);
+    const currentResidents = filteredAssessments.slice(
+      (currentPage - 1) * residentsPerPage,
+      currentPage * residentsPerPage
+    );
+  
+    const nextPage = () => {
+      if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+    };
+  
+    const prevPage = () => {
+      if (currentPage > 1) setCurrentPage(currentPage - 1);
+    };
+  
   
 
   const handleAddAssessment = () => {
@@ -97,13 +130,50 @@ const Assessment: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b py-16 px-6 relative">
-      <h1 className="text-xl sm:text-3xl md:text-4xl font-extrabold text-center text-green-800 mb-14 drop-shadow-md">
+    <div className="min-h-screen bg-gradient-to-b py-10 px-6 relative">
+      <h1 className="text-xl sm:text-3xl md:text-4xl font-extrabold text-center text-green-800 mb-6 drop-shadow-md">
         Assessments Overview
       </h1>
 
+
+<div className="w-full max-w-7xl mx-auto mb-4 px-2">
+  <form
+    onSubmit={(e) => {
+      e.preventDefault();
+      handleSearch();
+    }}
+    className="flex w-full gap-2 flex-nowrap"
+  >
+    <input
+      type="text"
+      placeholder="Search by assessment name"
+      value={searchName}
+      onChange={(e) => {
+        const value = e.target.value;
+        setSearchName(value);
+        setCurrentPage(1);
+        setSearchTerm(value.trim());
+      }}
+      className="flex-grow min-w-0 border border-gray-400 rounded-md
+      py-[10px] px-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+    />
+    <button
+      type="submit"
+      className="bg-green-700 hover:bg-green-800 text-white
+      rounded-md flex items-center gap-2 whitespace-nowrap
+      min-w-[80px] py-2 lg:py-2 px-3 lg:px-4 text-sm lg:text-base"
+    >
+      <FaSearch className="text-sm" />
+      Search
+    </button>
+  </form>
+</div>
+
+
+
       <div className="w-full max-w-7xl mx-auto grid gap-8">
-        {assessments.map((assessment) => (
+      {currentResidents.map((assessment) => (
+
           <div
             key={assessment.id}
             className="flex flex-col sm:flex-row sm:items-center justify-between bg-white border border-gray-200 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 px-8 py-6 space-y-4 sm:space-y-0"
@@ -139,6 +209,33 @@ const Assessment: React.FC = () => {
           </div>
         ))}
       </div>
+      <div className="flex justify-center items-center mt-8 gap-4 flex-wrap">
+          <button
+            onClick={prevPage}
+            disabled={currentPage === 1}
+            className={`px-4 py-2 rounded-md text-white ${
+              currentPage === 1
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-green-700'
+            }`}
+          >
+            Previous
+          </button>
+          <span className="text-base font-medium">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={nextPage}
+            disabled={currentPage === totalPages}
+            className={`px-4 py-2 rounded-md text-white ${
+              currentPage === totalPages
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-green-700'
+            }`}
+          >
+            Next
+          </button>
+        </div>
 
       <div
         onClick={handleAddAssessment}
@@ -148,7 +245,6 @@ const Assessment: React.FC = () => {
         <span className="text-sm font-medium text-green-600">Add New Assessment</span>
       </div>
 
-      {/* Add Modal */}
       {showAddAssessmentModal && (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-2 sm:px-4">
     <div className="relative w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl p-6 bg-white rounded-2xl shadow-2xl">
