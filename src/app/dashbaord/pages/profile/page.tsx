@@ -49,17 +49,17 @@ const UserListPage = () => {
 
 
   return (
-    <div className="min-h-screen  py-10 px-6 sm:px-10">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-10 text-center">
-          User List
-        </h1>
+    <div className="min-h-screen bg-gradient-to-b py-10 px-6 relative">
+      <div className="max-w-7xl mx-auto ">
+      <h1 className="text-xl sm:text-3xl md:text-4xl font-extrabold text-center text-green-800 mb-6 drop-shadow-md">
+        Users
+      </h1>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {users.map((user) => (
             <div
               key={user.id}
-              className="bg-green-50 rounded-3xl shadow-lg p-6 flex flex-col items-center text-center"
+              className=" rounded-3xl shadow-lg p-6 flex flex-col items-center text-center border-green-100  border-2 "
             >
               <img
                 src={user.image}
