@@ -15,10 +15,11 @@ const ResidentList: React.FC = () => {
   console.log("API URL:", api_url);
   console.log("Token:", token);
   const [residents, setResidents] = useState<any[]>([]);
-
+  const [totalresident, settotalResident] = useState(0);
   const [selectedYear, setSelectedYear] = useState("2025");
   const [type, setType] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
+  console.log("Current Page:", currentPage);
   const [showAddResidentModal, setShowAddResidentModal] = useState(false);
 
    const handlefetchResident = async () => {
@@ -26,7 +27,7 @@ const ResidentList: React.FC = () => {
     let url = "";
 
     if (type === "all") {
-      url = `${api_url}/beneficiaries`;
+      url = `${api_url}/beneficiaries?populate=profile_img_url&pagination[page]=1&pagination[pageSize]=1000`;
     } else {
       url = `${api_url}/curriculum-program-levels?filters[program_level][program_level_name][$eq]=Level%20${type}&filters[curriculum][end_date][$lte]=${selectedYear}-12-31&populate[residents][populate]=profile_img_url&populate=*`;
     }
@@ -39,17 +40,27 @@ const ResidentList: React.FC = () => {
     });
 
     const data = response.data;
-    console.log("Fetched data:", data);
-    setResidents(data.data[0]?.attributes?.residents?.data || data.data);
+    console.log("Fetched data:", data.data);
+   if (type === "all") {
+  settotalResident(data.data.length);
+  setResidents(data.data);
+} else {
+  settotalResident(data.data[0]?.attributes?.residents?.data.length || 0);
+  setResidents(data.data[0]?.attributes?.residents?.data || []);
+}
+
   } catch (error) {
     console.error("Error fetching residents:", error);
   }
 };
 
 useEffect(() => {
-  handlefetchResident();
+  setCurrentPage(1);
 }, [type, selectedYear]);
 
+useEffect(() => {
+  handlefetchResident();
+}, [type, selectedYear, currentPage]);
 
   const [newResidentData, setNewResidentData] = useState({
     name: "",
@@ -69,13 +80,15 @@ useEffect(() => {
     return matchName;
   });
 
-  const totalResidents = filteredResidents.length;
-  const totalPages = Math.ceil(totalResidents / residentsPerPage);
+   const totalResidents = filteredResidents.length;
 
-  const currentResidents = filteredResidents.slice(
+  const totalPages = Math.ceil(totalResidents / residentsPerPage);
+   
+  let currentResidents = filteredResidents.slice(
     (currentPage - 1) * residentsPerPage,
     currentPage * residentsPerPage
   );
+
 
   const nextPage = () => {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);

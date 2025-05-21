@@ -29,7 +29,7 @@ const BoxResident: React.FC<BoxResidentProps> = ({ image, name, dob, id }) => {
 
   return (
     <Link
-      href={`/dashbaord/pages/resident/residentInfo`}
+      href={`/dashbaord/pages/resident/residentInfo/${id}`}
       className="block"
     >
       <div className="flex items-center justify-between gap-2 p-4 border border-gray-300 bg-[#F6F6F6] shadow-md rounded-xl sm:p-4 sm:gap-6 hover:shadow-lg hover:bg-gray-100 transition-all duration-200 cursor-pointer">
