@@ -21,7 +21,7 @@ const ProgramBox: React.FC<ProgramBoxProps> = ({ title, image, level }) => {
       )}
       <div className="p-6 flex flex-col items-center text-center">
         <h3 className="text-2xl font-semibold text-green-800 mb-2">{title}</h3>
-        <p className="text-sm text-gray-600 mb-4">{level}</p>
+        {/* <p className="text-sm text-gray-600 mb-4">{level}</p> */}
         <Link
           href="/dashbaord/pages/program/programActivities"
           className="inline-flex items-center gap-2 bg-green-700 text-white text-sm font-medium py-2 px-5 rounded-full hover:bg-green-800 transition duration-200"
