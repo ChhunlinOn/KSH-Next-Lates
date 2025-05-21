@@ -1,34 +1,11 @@
 "use client";
-import React, { useState } from 'react';
-import { FaWpforms, FaEdit, FaSave, FaTimes, FaPlus, FaTrash } from 'react-icons/fa';
+import React, { useEffect, useState } from 'react';
+import { FaWpforms, FaEdit, FaPlus, FaSearch, FaTrash, FaTimes, FaSave } from 'react-icons/fa';
 import { MdArrowForward } from 'react-icons/md';
-import { FaSearch} from 'react-icons/fa'
-
-const initialAssessments = [
-  {
-    id: 1,
-    title: 'Health & Wellbeing Assessment',
-    google_form_url: 'https://example.com/form1',
-  },
-  {
-    id: 2,
-    title: 'Mental Health Follow-up',
-    google_form_url: 'https://example.com/form2',
-  },
-  {
-    id: 3,
-    title: 'Nutrition and Diet Survey',
-    google_form_url: 'https://example.com/form3',
-  },
-  {
-    id: 4,
-    title: 'Post-Program Feedback',
-    google_form_url: 'https://example.com/form4',
-  },
-];
+import axios from "axios";
 
 const Assessment: React.FC = () => {
-  const [assessments, setAssessments] = useState(initialAssessments);
+  const [assessments, setAssessments] = useState<any[]>([]);
   const [editId, setEditId] = useState<number | null>(null);
   const [editValues, setEditValues] = useState({ title: '', url: '' });
   const [showAddAssessmentModal, setShowAddAssessmentModal] = useState(false);
@@ -36,26 +13,116 @@ const Assessment: React.FC = () => {
     title: '',
     imageUrl: '',
   });
-    const [searchName, setSearchName] = useState('');
-    const [searchTerm, setSearchTerm] = useState('');
-    const [currentPage, setCurrentPage] = useState(1);
+  const [searchName, setSearchName] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const handleEdit = (id: number, current: { id?: number; title: string; google_form_url: string }) => {
+  const api_url = process.env.NEXT_PUBLIC_API_URL;
+  const token = process.env.NEXT_PUBLIC_TOKEN;
+
+  const fetchAssessments = async () => {
+    try {
+      const url = `${api_url}/assessments?populate=*`;
+      const response = await axios.get(url, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      const fetchedData = response.data.data.map((item: any) => ({
+        id: item.id,
+        title: item.attributes.title,
+        google_form_url: item.attributes.google_form_url,
+      }));
+
+      setAssessments(fetchedData);
+    } catch (error) {
+      console.error("Error fetching assessments:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAssessments();
+  }, []);
+
+  const handleEdit = (id: number, current: { title: string; google_form_url: string }) => {
     setEditId(id);
     setEditValues({ title: current.title, url: current.google_form_url });
   };
 
-  const handleSave = () => {
-    setAssessments((prev) =>
-      prev.map((item) =>
-        item.id === editId
-          ? { ...item, title: editValues.title, google_form_url: editValues.url }
-          : item
-      )
-    );
-    setEditId(null);
+  // const handleSave = async () => {
+  //   if (!editValues.title || !editValues.url) {
+  //     alert('Please fill in both fields.');
+  //     return;
+  //   }
+  
+  //   try {
+  //     await axios.put(
+  //       `${api_url}/assessments/${editId}`, // PUT to specific assessment ID
+  //       {
+  //         data: {
+  //           title: editValues.title,
+  //           google_form_url: editValues.url,
+  //         },
+  //       },
+  //       {
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           Authorization: `Bearer ${token}`, // make sure you have your token
+  //         },
+  //       }
+  //     );
+  
+  //     // Refresh list from backend
+  //     fetchAssessments();
+  //     setEditId(null);
+  //   } catch (error) {
+  //     console.error('Failed to update assessment:', error);
+  //     alert('Something went wrong while saving. Please try again.');
+  //   }
+  // };
+  
+  const handleSave = async () => {
+    if (!editValues.title || !editValues.url) {
+      alert('Please fill in both fields.');
+      return;
+    }
+  
+    try {
+      // Send PUT request to update the item in the database
+      await axios.put(
+        `${api_url}/assessments/${editId}`,
+        {
+          data: {
+            title: editValues.title,
+            google_form_url: editValues.url,
+          },
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      // Update it locally in the list (keep position)
+      setAssessments((prev) =>
+        prev.map((item) =>
+          item.id === editId
+            ? { ...item, title: editValues.title, google_form_url: editValues.url }
+            : item
+        )
+      );
+  
+      setEditId(null); // Close the modal
+    } catch (error) {
+      console.error('Failed to update assessment:', error);
+      alert('Something went wrong while saving. Please try again.');
+    }
   };
-
+  
   const handleCancel = () => {
     setEditId(null);
   };
@@ -67,37 +134,37 @@ const Assessment: React.FC = () => {
       setEditId(null);
     }
   };
-    const handleSearch = () => {
-      setCurrentPage(1);
-      setSearchTerm(searchName.trim());
-    };
-  
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'Enter') {
-        handleSearch();
-      }
-    };
-    const filteredAssessments = assessments.filter((assessment) =>
-      assessment.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      assessment.google_form_url
-    );
-  
-    const residentsPerPage = 5;
-    const totalPages = Math.ceil(filteredAssessments.length / residentsPerPage);
-    const currentResidents = filteredAssessments.slice(
-      (currentPage - 1) * residentsPerPage,
-      currentPage * residentsPerPage
-    );
-  
-    const nextPage = () => {
-      if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-    };
-  
-    const prevPage = () => {
-      if (currentPage > 1) setCurrentPage(currentPage - 1);
-    };
-  
-  
+
+  const handleSearch = () => {
+    setCurrentPage(1);
+    setSearchTerm(searchName.trim());
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  const filteredAssessments = assessments.filter((assessment) =>
+    assessment.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    assessment.google_form_url
+  );
+
+  const residentsPerPage = 5;
+  const totalPages = Math.ceil(filteredAssessments.length / residentsPerPage);
+  const currentResidents = filteredAssessments.slice(
+    (currentPage - 1) * residentsPerPage,
+    currentPage * residentsPerPage
+  );
+
+  const nextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
+
+  const prevPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
 
   const handleAddAssessment = () => {
     setShowAddAssessmentModal(true);
@@ -115,19 +182,37 @@ const Assessment: React.FC = () => {
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (newAssessmentData.title && newAssessmentData.imageUrl) {
-      const newAssessment = {
-        id: assessments.length + 1,
-        title: newAssessmentData.title,
-        google_form_url: newAssessmentData.imageUrl,
-      };
-      setAssessments([...assessments, newAssessment]);
-      setShowAddAssessmentModal(false);
+      try {
+        const response = await axios.post(
+          `${api_url}/assessments`,
+          {
+            data: {
+              title: newAssessmentData.title,
+              google_form_url: newAssessmentData.imageUrl,
+            },
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+  
+        fetchAssessments();
+        setShowAddAssessmentModal(false);
+        setNewAssessmentData({ title: '', imageUrl: '' }); 
+      } catch (error) {
+        console.error('Error creating new assessment:', error);
+        alert('Failed to add assessment. Please try again.');
+      }
     } else {
       alert('Please fill out all fields!');
     }
   };
+  
 
   return (
     <div className="min-h-screen bg-gradient-to-b py-10 px-6 relative">
@@ -349,8 +434,6 @@ const Assessment: React.FC = () => {
 )}
 
     </div>
-  );
-};
+  );};
 
 export default Assessment;
-
