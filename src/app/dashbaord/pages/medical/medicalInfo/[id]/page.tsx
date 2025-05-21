@@ -1,8 +1,11 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import Link from 'next/link';
 import { FaTimes, FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
-import ResidentBoxInfo from '../../../../component/medicalBoxInfo';
+import ResidentBoxInfo from '../../../../../component/medicalBoxInfo';
+import { useParams } from 'next/navigation';
+import dotenv from 'dotenv';
+import formatDate from '../../../../../component/Formatdate';
 
 interface CustomInfo {
   name: string;
@@ -16,9 +19,18 @@ interface Document {
 }
 
 const MedicalDetailPage: React.FC = () => {
+  
   const [showAddResidentModal, setShowAddResidentModal] = useState(false);
   const [newInfo, setNewInfo] = useState<CustomInfo>({ name: '', value: '' });
   const [customInfos, setCustomInfos] = useState<CustomInfo[]>([]);
+  const [residentMedical, setResidentMedical] = useState<any>(null);
+  const [residentimg, setResidentImg] = useState<any>(null);
+  dotenv.config();
+const api_url = process.env.NEXT_PUBLIC_API_URL;
+const token = process.env.NEXT_PUBLIC_TOKEN;
+const params = useParams();
+const id = params.id; 
+console.log(id);
   const [documents] = useState<Document[]>([
     {
       title: 'Medical Report',
@@ -45,36 +57,84 @@ const MedicalDetailPage: React.FC = () => {
     }
   };
 
-
-  const medicalData = {
-    fullname_english: 'Kim Alysa',
-    gender: 'Female',
-    type_of_disability: 'Autism Spectrum Disorder',
-    date_of_birth: '01-01-1990',
-    is_required_medical_use: true,
-    medical_use: 'Anti-seizure medication',
-    is_active: true,
-    start_date: '01-01-2022',
-    end_date: '01-01-2023',
-    medical_treatment: 'Occupational therapy, Speech therapy',
-    doctor_name: 'Dr. Emily Smith',
-    comment: 'Needs regular therapy and follow-up every 3 months.',
-    next_appointment: '01-07-2025',
-    profile_img_url: {
-      data: {
-        attributes: {
-          formats: {
-            thumbnail: {
-              url: 'https://static.vecteezy.com/system/resources/thumbnails/038/962/461/small/ai-generated-caucasian-successful-confident-young-businesswoman-ceo-boss-bank-employee-worker-manager-with-arms-crossed-in-formal-wear-isolated-in-white-background-photo.jpg',
-            },
-          },
-        },
-      },
+  const handlefetchResident = async () => {
+    try {
+      const response = await fetch(
+  `${api_url}/resident-medicals/${id}?populate[resident][populate][profile_img_url]=true&populate=resident`,
+  {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
     },
+  }
+);
+      const data = await response.json();
+      console.log(data.data.attributes);
+      setResidentMedical(data.data.attributes);
+    } catch (error) {
+      console.error('Error fetching resident data:', error);
+    }
   };
 
-  const profileImageUrl =
-    medicalData.profile_img_url?.data?.attributes?.formats?.thumbnail?.url || null;
+  // console.log('resident id',residentMedical.resident?.data.id);
+
+  const residentid = residentMedical?.resident?.data.id || null;
+  console.log('resident id', residentid);
+
+// Fetch resident medical info on mount
+useEffect(() => {
+  handlefetchResident();
+}, []);
+
+// Fetch resident details when residentid is available
+useEffect(() => {
+  if (residentid) {
+    handleResidentdata();
+  }
+}, [residentid]);
+
+const handleResidentdata = async () => {
+  if (!residentid) return; // Guard: don't run if id is not ready
+  try {
+    const response = await fetch(
+      `${api_url}/beneficiaries/${residentid}?populate=*`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const data = await response.json();
+    // You can set state here if needed, e.g. setResidentInfo(data.data.attributes);
+    setResidentImg(data.data?.attributes?.profile_img_url?.data?.attributes?.url);
+  } catch (error) {
+    console.error('Error fetching resident data:', error);
+  }
+};
+
+  const medicalData = {
+    fullname_english: residentMedical?.resident?.data.attributes.fullname_english || 'none',
+    gender: residentMedical?.resident?.data.attributes.gender || 'none',
+    type_of_disability: residentMedical?.resident?.data.attributes.type_of_disability || 'none',
+    date_of_birth: formatDate(residentMedical?.resident?.data.attributes.date_of_birth) || 'none',
+    is_required_medical_use: residentMedical?.require_to_use || 'none',
+    medical_use: 'Anti-seizure medication',
+    is_active: true,
+    start_date: formatDate(residentMedical?.start_date) || 'none',
+    end_date: formatDate(residentMedical?.end_date) || 'none',
+    medical_treatment: residentMedical?.medical_treatment || 'none',
+    doctor_name: residentMedical?.doctor || 'none',
+    comment: residentMedical?.specailist_doctor_comment || 'nothing',
+    next_appointment: formatDate(residentMedical?.next_appointment) || 'none'
+  };
+
+  const profileImageUrl =  residentimg || null;
 
   return (
     <div className="min-h-screen p-8 relative">

@@ -12,8 +12,10 @@ interface BoxResidentProps {
   id: string;
 }
 
-const calculateAge = (dob: string): number => {
+const calculateAge = (dob: string | null): number | null => {
+  if (!dob) return null;
   const birthDate = new Date(dob);
+  if (isNaN(birthDate.getTime())) return null;
   const today = new Date();
   let age = today.getFullYear() - birthDate.getFullYear();
   const m = today.getMonth() - birthDate.getMonth();
@@ -51,8 +53,8 @@ const BoxResident: React.FC<BoxResidentProps> = ({ image, name, dob, id }) => {
             <p className="text-[#207137] font-bold text-sm sm:text-lg md:text-xl">
               {name}
             </p>
-            <p className="text-gray-700 text-xs sm:text-base md:text-lg">
-              Age: {age > 0 ? `${age} years old` : 'N/A'}
+           <p className="text-gray-700 text-xs sm:text-base md:text-lg">
+              Age: {age !== null && age > 0 ? `${age} years old` : 'N/A'}
             </p>
           </div>
         </div>

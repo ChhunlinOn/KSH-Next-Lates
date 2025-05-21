@@ -4,7 +4,7 @@ import React, { useState,useEffect } from "react";
 import BoxResident from "../../../component/boxResident";
 import DropdownYearResident from "../../../component/dropDownYearResident";
 import { FaPlus, FaTimes, FaSearch } from "react-icons/fa";
-import axois from "axios";
+// import axois from "axios";
 import dotenv from "dotenv";
 
 
@@ -22,7 +22,7 @@ const ResidentList: React.FC = () => {
   console.log("Current Page:", currentPage);
   const [showAddResidentModal, setShowAddResidentModal] = useState(false);
 
-   const handlefetchResident = async () => {
+ const handlefetchResident = async () => {
   try {
     let url = "";
 
@@ -32,22 +32,28 @@ const ResidentList: React.FC = () => {
       url = `${api_url}/curriculum-program-levels?filters[program_level][program_level_name][$eq]=Level%20${type}&filters[curriculum][end_date][$lte]=${selectedYear}-12-31&populate[residents][populate]=profile_img_url&populate=*`;
     }
 
-    const response = await axois.get(url, {
+    const response = await fetch(url, {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
+        'Authorization': `Bearer ${token}`,
+      },
     });
 
-    const data = response.data;
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
     console.log("Fetched data:", data.data);
-   if (type === "all") {
-  settotalResident(data.data.length);
-  setResidents(data.data);
-} else {
-  settotalResident(data.data[0]?.attributes?.residents?.data.length || 0);
-  setResidents(data.data[0]?.attributes?.residents?.data || []);
-}
+
+    if (type === "all") {
+      settotalResident(data.data.length);
+      setResidents(data.data);
+    } else {
+      settotalResident(data.data[0]?.attributes?.residents?.data.length || 0);
+      setResidents(data.data[0]?.attributes?.residents?.data || []);
+    }
 
   } catch (error) {
     console.error("Error fetching residents:", error);

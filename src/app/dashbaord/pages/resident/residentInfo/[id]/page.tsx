@@ -5,6 +5,7 @@ import { FaTimes, FaPlus } from 'react-icons/fa';
 import ResidentBoxInfo from '../../../../../component/residentBoxInfo';
 import { useParams } from 'next/navigation';
 import dotenv from "dotenv"
+import formatDate from '@/app/component/Formatdate';
 
 interface CustomInfo {
   name: string;
@@ -64,12 +65,12 @@ const ResidentDetailPage: React.FC = () => {
     fullname_english: resident?.fullname_english || 'none',
     gender: resident?.gender || 'none',
     type_of_disability: resident?.type_of_disability || 'none',
-    date_of_birth:resident?.date_of_birth || 'none',
+    date_of_birth:formatDate(resident?.date_of_birth) || 'none',
     is_required_medical_use: resident?.is_required_medical_use || false,
     medical_use: resident?.medical_use || 'none',
     is_active: resident?.is_active || false,
-    start_date: resident?.start_date || 'none',
-    end_date: resident?.end_date || 'none',
+    start_date: formatDate(resident?.start_date) || 'none',
+    end_date: formatDate(resident?.end_date) || 'none',
   };
 
   const profileImageUrl = resident?.profile_img_url?.data?.attributes?.url || null;

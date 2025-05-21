@@ -1,82 +1,39 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import BoxResident from '../../../component/medicalBox';
 import { FaPlus, FaTimes, FaSearch } from 'react-icons/fa';
+import dotenv from 'dotenv';
 
 const MedicalList: React.FC = () => {
-  const [residents, setResidents] = useState<any[]>([
-    {
-      id: '1',
-      name: 'Sok Dara',
-      date_of_birth: '2005-06-15',
-      image:
-        'https://static.vecteezy.com/system/resources/thumbnails/038/962/461/small/ai-generated-caucasian-successful-confident-young-businesswoman-ceo-boss-bank-employee-worker-manager-with-arms-crossed-in-formal-wear-isolated-in-white-background-photo.jpg',
-      medicalUse: true,
-    },
-    {
-      id: '2',
-      name: 'Kim Lina',
-      date_of_birth: '2006-02-20',
-      image:
-        'https://static.vecteezy.com/system/resources/thumbnails/038/962/461/small/ai-generated-caucasian-successful-confident-young-businesswoman-ceo-boss-bank-employee-worker-manager-with-arms-crossed-in-formal-wear-isolated-in-white-background-photo.jpg',
-      medicalUse: true,
-    },
-    {
-      id: '3',
-      name: 'Kim Alysa',
-      date_of_birth: '2006-02-20',
-      image:
-        'https://static.vecteezy.com/system/resources/thumbnails/038/962/461/small/ai-generated-caucasian-successful-confident-young-businesswoman-ceo-boss-bank-employee-worker-manager-with-arms-crossed-in-formal-wear-isolated-in-white-background-photo.jpg',
-      medicalUse: true,
-    },
-    {
-      id: '4',
-      name: 'Kim Kanha',
-      date_of_birth: '2006-02-20',
-      image:
-        'https://static.vecteezy.com/system/resources/thumbnails/038/962/461/small/ai-generated-caucasian-successful-confident-young-businesswoman-ceo-boss-bank-employee-worker-manager-with-arms-crossed-in-formal-wear-isolated-in-white-background-photo.jpg',
-      medicalUse: true,
-    },
-    {
-      id: '5',
-      name: 'Kim Nynao',
-      date_of_birth: '2006-02-20',
-      image:
-        'https://static.vecteezy.com/system/resources/thumbnails/038/962/461/small/ai-generated-caucasian-successful-confident-young-businesswoman-ceo-boss-bank-employee-worker-manager-with-arms-crossed-in-formal-wear-isolated-in-white-background-photo.jpg',
-    },
-    {
-      id: '6',
-      name: 'Kim Kaknika',
-      date_of_birth: '2006-02-20',
-      image:
-        'https://static.vecteezy.com/system/resources/thumbnails/038/962/461/small/ai-generated-caucasian-successful-confident-young-businesswoman-ceo-boss-bank-employee-worker-manager-with-arms-crossed-in-formal-wear-isolated-in-white-background-photo.jpg',
-      medicalUse: true,
-    },
-    {
-      id: '7',
-      name: 'Kim Lina',
-      date_of_birth: '2006-02-20',
-      image:
-        'https://static.vecteezy.com/system/resources/thumbnails/038/962/461/small/ai-generated-caucasian-successful-confident-young-businesswoman-ceo-boss-bank-employee-worker-manager-with-arms-crossed-in-formal-wear-isolated-in-white-background-photo.jpg',
-      medicalUse: true,
-    },
-    {
-      id: '8',
-      name: 'Kim Nona',
-      date_of_birth: '2006-02-20',
-      image:
-        'https://static.vecteezy.com/system/resources/thumbnails/038/962/461/small/ai-generated-caucasian-successful-confident-young-businesswoman-ceo-boss-bank-employee-worker-manager-with-arms-crossed-in-formal-wear-isolated-in-white-background-photo.jpg',
-      medicalUse: true,
-    },
-    {
-      id: '9',
-      name: 'Kim Alyka',
-      date_of_birth: '2006-02-20',
-      image:
-        'https://static.vecteezy.com/system/resources/thumbnails/038/962/461/small/ai-generated-caucasian-successful-confident-young-businesswoman-ceo-boss-bank-employee-worker-manager-with-arms-crossed-in-formal-wear-isolated-in-white-background-photo.jpg',
-      medicalUse: true,
-    },
-  ]);
+  dotenv.config();
+  const api_url = process.env.NEXT_PUBLIC_API_URL;
+  const token = process.env.NEXT_PUBLIC_TOKEN;
+  console.log(api_url);
+  console.log(token);
+  const [residents, setResidents] = useState<any[]>([]);
+
+  const handlefetchResidents = async () => {
+    try {
+      const response = await fetch(
+        `${api_url}/resident-medicals?filters[require_to_use][$eq]=true&populate[resident][populate]=profile_img_url`, // Replace with your API endpoint
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`, // Replace with your API token
+          },
+        }
+      );
+      const data = await response.json();
+      console.log(data);
+      setResidents(data.data);
+    } catch (error) {
+      console.error('Error fetching residents:', error);
+    }
+  };
+
+  useEffect(() => {
+    handlefetchResidents();
+  }, []);
 
   const [searchName, setSearchName] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -128,10 +85,13 @@ const MedicalList: React.FC = () => {
   const handleAddResident = () => setShowAddResidentModal(true);
   const handleCloseModal = () => setShowAddResidentModal(false);
 
-  const filteredResidents = residents.filter((resident) =>
-    resident.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    resident.medicalUse
-  );
+  const filteredResidents = residents.filter((resident) => {
+    const name =
+      resident?.attributes?.resident?.data?.attributes?.fullname_english ||
+      resident?.name ||
+      '';
+    return name.toLowerCase().includes(searchTerm.toLowerCase());
+  });
 
   const residentsPerPage = 10;
   const totalPages = Math.ceil(filteredResidents.length / residentsPerPage);
@@ -185,9 +145,9 @@ const MedicalList: React.FC = () => {
               <BoxResident
                 key={resident.id}
                 id={resident.id}
-                image={resident.image}
-                name={resident.name}
-                medicalUse={resident.medicalUse}
+                image={resident?.attributes?.resident?.data?.attributes?.profile_img_url?.data?.attributes?.url}
+                name={resident?.attributes?.resident?.data?.attributes?.fullname_english}
+                medicalUse={resident.attributes?.require_to_use}
               />
             ))
           ) : (
