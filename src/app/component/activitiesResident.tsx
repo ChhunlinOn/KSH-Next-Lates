@@ -39,7 +39,7 @@ const ProgramInfoBox: React.FC<ProgramBoxProps> = ({
               <option value="Good">✅ Good</option>
               <option value="50/50">🔄 50/50</option>
               <option value="Not Good">❌ Not Good</option>
-              <option value="??">❓ ??</option>
+              <option value="??">❓ Uncheckable</option>
             </select>
           </div>
 
