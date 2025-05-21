@@ -107,7 +107,7 @@ const TOKEN = process.env.NEXT_PUBLIC_TOKEN;
   };
 
   const fectchResident = async () => {
-    const response = await fetch(`${API_URL}/curriculum-program-levels?filters[program_level][program_level_name][$eq]=Level%201&filters[curriculum][end_date][$lte]=2025-12-31&populate[residents][populate]=profile_img_url&populate=*`, {
+    const response = await fetch(`${API_URL}/beneficiaries?populate=profile_img_url&pagination[page]=1&pagination[pageSize]=1000`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -118,8 +118,8 @@ const TOKEN = process.env.NEXT_PUBLIC_TOKEN;
       throw new Error('Failed to fetch data');
     }
     const data = await response.json();
-    console.log('Fetched data:', data.data[0].attributes.residents.data[0].attributes);
-    setSearch(data.data[0].attributes.residents.data);
+    console.log('Fetched data:', data.data);
+    setSearch(data.data);
   };
 
   useEffect(() => {

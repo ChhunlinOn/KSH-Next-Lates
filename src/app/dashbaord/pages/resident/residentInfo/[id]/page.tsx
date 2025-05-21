@@ -1,8 +1,10 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FaTimes, FaPlus } from 'react-icons/fa';
-import ResidentBoxInfo from '../../../../component/residentBoxInfo';
+import ResidentBoxInfo from '../../../../../component/residentBoxInfo';
+import { useParams } from 'next/navigation';
+import dotenv from "dotenv"
 
 interface CustomInfo {
   name: string;
@@ -10,9 +12,16 @@ interface CustomInfo {
 }
 
 const ResidentDetailPage: React.FC = () => {
+   dotenv.config();
+    const api_url = process.env.NEXT_PUBLIC_API_URL; 
+    const token = process.env.NEXT_PUBLIC_TOKEN;
   const [showAddResidentModal, setShowAddResidentModal] = useState(false);
   const [newInfo, setNewInfo] = useState<CustomInfo>({ name: '', value: '' });
   const [customInfos, setCustomInfos] = useState<CustomInfo[]>([]);
+  const [resident, setResidents] = useState<any>(null);
+  const params = useParams();
+  const id = params.id; 
+  console.log(id);
 
   const handleOpenModal = () => setShowAddResidentModal(true);
   const handleCloseModal = () => setShowAddResidentModal(false);
@@ -25,30 +34,46 @@ const ResidentDetailPage: React.FC = () => {
     }
   };
 
-  const residentData = {
-    fullname_english: 'John Doe',
-    gender: 'Male',
-    type_of_disability: 'None',
-    date_of_birth: '01-01-1990',
-    is_required_medical_use: false,
-    medical_use: 'None',
-    is_active: true,
-    start_date: '01-01-2022',
-    end_date: '01-01-2023',
-    profile_img_url: {
-      data: {
-        attributes: {
-          formats: {
-            thumbnail: {
-              url: 'https://img.freepik.com/premium-photo/professional-business-woman-cartoon-character-with-glasses-arms-crossed-confidence-pink_996993-57501.jpg',
-            }
-          }
+  const handlefetchResident = async () => {
+    try {
+      const response = await fetch(`${api_url}/beneficiaries/${id}?populate=*`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
         }
+      );
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
       }
+      const data = await response.json();
+      console.log(data.data.attributes);
+      setResidents(data.data.attributes);
+    } catch (error) {
+      console.error('Error fetching resident data:', error);
     }
   };
+  useEffect(() => {
+    handlefetchResident();
+  }
+  , []);
 
-  const profileImageUrl = residentData.profile_img_url?.data?.attributes?.formats?.thumbnail?.url || null;
+  const residentData = {
+    fullname_english: resident?.fullname_english || 'none',
+    gender: resident?.gender || 'none',
+    type_of_disability: resident?.type_of_disability || 'none',
+    date_of_birth:resident?.date_of_birth || 'none',
+    is_required_medical_use: resident?.is_required_medical_use || false,
+    medical_use: resident?.medical_use || 'none',
+    is_active: resident?.is_active || false,
+    start_date: resident?.start_date || 'none',
+    end_date: resident?.end_date || 'none',
+  };
+
+  const profileImageUrl = resident?.profile_img_url?.data?.attributes?.url || null;
+  console.log('profile',profileImageUrl)
 
   return (
     <div className="min-h-screen px-4 sm:px-6 md:px-10 py-8">
