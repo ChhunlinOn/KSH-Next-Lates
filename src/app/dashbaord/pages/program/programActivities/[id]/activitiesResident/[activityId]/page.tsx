@@ -1,12 +1,22 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import ProgramInfoBox from "../../../../../component/activitiesResident";
+import ProgramInfoBox from "@/app/component/activitiesResident";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaSearch } from "react-icons/fa";
 import Link from "next/link";
+import dotenv from "dotenv";
+import { useParams } from "next/navigation";
 
 const ActivitiesResident = () => {
+  dotenv.config();
+  const api_url = process.env.NEXT_PUBLIC_API_URL;
+  const token = process.env.NEXT_PUBLIC_TOKEN;
+  const params = useParams();
+  const id = params.id;
+  const activityId = params.activityId;
+  console.log(id);
+  console.log(activityId);
   const [programInfo, setProgramInfo] = useState<any[]>([]);
   const [filteredProgramInfo, setFilteredProgramInfo] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -15,14 +25,37 @@ const ActivitiesResident = () => {
   const [customDate, setCustomDate] = useState("");
   const [searchName, setSearchName] = useState("");
   const [loading, setLoading] = useState(true);
+  const [programActivities, setProgramActivities] = useState<any>({});
 
   const itemsPerPage = 4;
   const today = new Date().toISOString().split("T")[0];
   const selectedDate = selectedOption === "today" ? today : customDate;
 
-  const title = "Hygiene";
-  const image =
-    "https://as2.ftcdn.net/jpg/01/81/91/45/1000_F_181914597_tXKzwgfkdsYfbXGMJqrwFOT1U4HV375m.jpg";
+  const handlefetchActivities = async () => {
+    try {
+      const response = await fetch(
+        `${api_url}/program-activities/${activityId}?populate=*`, // Replace with your API endpoint
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`, // Replace with your API token
+          },
+        }
+      );
+      const data = await response.json();
+      console.log(data.data);
+      setProgramActivities(data.data);
+    } catch (error) {
+      console.error("Error fetching activities:", error);
+    }
+  };
+  useEffect(() => {
+    handlefetchActivities();
+  }
+    , []);
+
+  const title = programActivities.attributes?.program_activity_name || "";
+  const image = programActivities.attributes?.img_url.data[0].attributes.url || "https://ui-avatars.com/api/";
 
   const residentNames = [
     "Sokha Chan", "Nita Thea", "Dara Kim", "Sophea Lim", "Rachana Em",
@@ -30,39 +63,33 @@ const ActivitiesResident = () => {
     "Rithy Yim", "Dalin Meas", "Nika Leng", "Borey Pich",
   ];
 
+  const handftchprograminfo = async () => {
+    try {
+      const response = await fetch(
+        `${api_url}/resident-checklists?filters[checklist_date][$eq]=2025-05-14&filters[program_activity][program_activity_name][$eq]=Clean%20the%20Leaf&populate[program_activity]=true&populate[score_point]=true&populate[resident][populate]=profile_img_url&pagination[page]=1&pagination[pageSize]=100`, // Replace with your API endpoint
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`, // Replace with your API token
+          },
+        }
+      );
+      const data = await response.json();
+      console.log(data.data);
+      setProgramInfo(data.data || []);
+      setFilteredProgramInfo(data.data || []);
+      setTotalPages(Math.ceil((data.data.length || 0) / itemsPerPage));
+    } catch (error) {
+      console.error("Error fetching activities:", error);
+    }
+  };
+
   useEffect(() => {
     setLoading(true);
-    const fakeData = Array.from({ length: residentNames.length }, (_, i) => ({
-      id: i + 1,
-      value: "50%",
-      attributes: {
-        description: "Nice effort",
-        score_point: { data: { attributes: { score_point: 50 } } },
-        resident: {
-          data: {
-            attributes: {
-              fullname_english: residentNames[i],
-              profile_img_url: {
-                data: {
-                  attributes: {
-                    formats: {
-                      thumbnail: {
-                        url: "https://img.pikbest.com/png-images/20241125/professional-businessman-cartoon-character-with-briefcase_11109331.png!f305cw",
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    }));
+    handftchprograminfo();
 
     setTimeout(() => {
-      setProgramInfo(fakeData);
-      setFilteredProgramInfo(fakeData);
-      setTotalPages(Math.ceil(fakeData.length / itemsPerPage));
+      handftchprograminfo();
       setLoading(false);
     }, 500);
   }, [selectedDate]);
@@ -114,62 +141,62 @@ const ActivitiesResident = () => {
 
         <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:justify-between">
           <div className="flex justify-between items-center w-full lg:w-1/2">
-            <Link href="/dashbaord/pages/program/programActivities">
+            <Link href={`/dashbaord/pages/program/programActivities/${id}`}>
               <button className="bg-gray-600 text-white px-6 py-2 rounded-md hover:bg-gray-500 transition">
                 Back
               </button>
             </Link>
-<div className="flex items-center gap-3">
-  <select
-    className="border border-gray-300 px-4 py-2 rounded-md focus:ring-2 focus:ring-green-500"
-    value={selectedOption}
-    onChange={handleOptionChange}
-  >
-    <option value="today">Today</option>
-    <option value="custom">Custom</option>
-  </select>
+            <div className="flex items-center gap-3">
+              <select
+                className="border border-gray-300 px-4 py-2 rounded-md focus:ring-2 focus:ring-green-500"
+                value={selectedOption}
+                onChange={handleOptionChange}
+              >
+                <option value="today">Today</option>
+                <option value="custom">Custom</option>
+              </select>
 
-  {selectedOption === "custom" && (
-    <input
-      type="date"
-      value={customDate}
-      onChange={handleDateChange}
-      className="border border-gray-300 px-3 py-1 rounded-md focus:ring-2 focus:ring-green-500
+              {selectedOption === "custom" && (
+                <input
+                  type="date"
+                  value={customDate}
+                  onChange={handleDateChange}
+                  className="border border-gray-300 px-3 py-1 rounded-md focus:ring-2 focus:ring-green-500
                  w-24 sm:w-28 md:w-32 lg:w-36"
-    />
-  )}
-</div>
+                />
+              )}
+            </div>
 
 
           </div>
 
           <div className="flex sm:flex-row items-stretch gap-3 w-full mt-4 lg:mt-0 lg:w-1/2">
-          <input
-  type="text"
-  placeholder="Search by resident name"
-  value={searchName}
-  onChange={(e) => {
-    const value = e.target.value;
-    setSearchName(value);
-    setCurrentPage(1);
+            <input
+              type="text"
+              placeholder="Search by resident name"
+              value={searchName}
+              onChange={(e) => {
+                const value = e.target.value;
+                setSearchName(value);
+                setCurrentPage(1);
 
-    if (value.trim() === "") {
-      setFilteredProgramInfo(programInfo);
-      setTotalPages(Math.ceil(programInfo.length / itemsPerPage));
-    } else {
-      const filtered = programInfo.filter((p) =>
-        p.attributes.resident.data.attributes.fullname_english
-          .toLowerCase()
-          .includes(value.toLowerCase())
-      );
-      setFilteredProgramInfo(filtered);
-      setTotalPages(Math.ceil(filtered.length / itemsPerPage));
-    }
-  }}
-  className="border border-gray-400 rounded-md flex-grow min-w-0
+                if (value.trim() === "") {
+                  setFilteredProgramInfo(programInfo);
+                  setTotalPages(Math.ceil(programInfo.length / itemsPerPage));
+                } else {
+                  const filtered = programInfo.filter((p) =>
+                    p.attributes.resident.data.attributes.fullname_english
+                      .toLowerCase()
+                      .includes(value.toLowerCase())
+                  );
+                  setFilteredProgramInfo(filtered);
+                  setTotalPages(Math.ceil(filtered.length / itemsPerPage));
+                }
+              }}
+              className="border border-gray-400 rounded-md flex-grow min-w-0
          py-2 lg:py-2 px-2 lg:px-3 text-sm lg:text-base
          focus:outline-none focus:ring-2 focus:ring-green-500"
-/>
+            />
 
             <button
               onClick={handleSearch}
@@ -200,22 +227,27 @@ const ActivitiesResident = () => {
         <div className="overflow-x-auto">
           <table className="w-full  rounded-lg shadow-sm">
             <tbody>
-              {getPaginatedData().map((program) => (
-                <ProgramInfoBox
-                  key={program.id}
-                  profile={
-                    program.attributes.resident.data.attributes
-                      .profile_img_url.data.attributes.formats.thumbnail.url
-                  }
-                  name={
-                    program.attributes.resident.data.attributes.fullname_english
-                  }
-                  initialValue={program.value}
-                  onValueChange={(val: string) =>
-                    handleValueChange(program.id, val)
-                  }
-                />
-              ))}
+              {getPaginatedData().length === 0 ? (
+  <tr>
+    <td colSpan={4} className="text-center py-8 text-gray-500 text-lg">
+      There no resident to checklist on this date
+    </td>
+  </tr>
+) : (
+  getPaginatedData().map((program) => (
+    <ProgramInfoBox
+      key={program.id}
+      profile={
+        program.attributes.resident.data.attributes
+          .profile_img_url?.data?.attributes?.formats?.thumbnail?.url ||
+        "https://ui-avatars.com/api/?name=No+Image"
+      }
+      name={program.attributes.resident.data.attributes.fullname_english}
+      initialValue={program.value}
+      onValueChange={(val: string) => handleValueChange(program.id, val)}
+    />
+  ))
+)}
             </tbody>
           </table>
         </div>
@@ -225,11 +257,10 @@ const ActivitiesResident = () => {
             <button
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className={`px-4 py-2 rounded-md text-white ${
-                currentPage === 1
+              className={`px-4 py-2 rounded-md text-white ${currentPage === 1
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-green-700 hover:bg-green-800"
-              }`}
+                }`}
             >
               Previous
             </button>
@@ -243,11 +274,10 @@ const ActivitiesResident = () => {
                 setCurrentPage((prev) => Math.min(prev + 1, totalPages))
               }
               disabled={currentPage === totalPages}
-              className={`px-4 py-2 rounded-md text-white ${
-                currentPage === totalPages
+              className={`px-4 py-2 rounded-md text-white ${currentPage === totalPages
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-green-700 hover:bg-green-800"
-              }`}
+                }`}
             >
               Next
             </button>
