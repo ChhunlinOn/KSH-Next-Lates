@@ -1,12 +1,9 @@
 "use client";
-
 import React, { useState,useEffect } from "react";
 import BoxResident from "../../../component/boxResident";
 import DropdownYearResident from "../../../component/dropDownYearResident";
 import { FaPlus, FaTimes, FaSearch } from "react-icons/fa";
-// import axois from "axios";
 import dotenv from "dotenv";
-
 
 const ResidentList: React.FC = () => {
   dotenv.config();
@@ -79,7 +76,6 @@ useEffect(() => {
   const residentsPerPage = 10;
 
   const filteredResidents = residents.filter((r) => {
-    // const matchYear = selectedYear ? r.attributes.date_of_birth.startsWith(selectedYear) : true;
     const matchName = searchTerm
       ? r.attributes.fullname_english.toLowerCase().includes(searchTerm.toLowerCase())
       : true;
@@ -152,8 +148,8 @@ useEffect(() => {
 
   return (
     <div className="flex justify-center w-full">
-      <div className="w-[95%] max-w-screen-xl">
-<div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 mt-16 mb-6">
+      <div className="w-[95%] max-w-screen-xl min-h-screen bg-gradient-to-b py-12 px-6 relative">
+<div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 mb-6">
 
 <div className="flex justify-between items-center w-full lg:w-auto gap-4">
 <DropdownYearResident
@@ -210,11 +206,9 @@ useEffect(() => {
   </button>
 </div>
 </div>
-
-        <h2 className="text-center text-xl sm:text-2xl md:text-3xl font-bold text-green-800 mb-6">
-          Residents
-        </h2>
-
+<h1 className="text-xl sm:text-3xl md:text-4xl font-extrabold text-center text-green-800 mb-6 drop-shadow-md">
+       Residents
+      </h1>
         <div className="flex flex-col gap-5 object-cover">
           {currentResidents.length > 0 ? (
             currentResidents.map((resident) => (
