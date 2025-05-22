@@ -71,6 +71,7 @@ const ProgramPage = () => {
     {programs.map((program) => (
       <ProgramBox
         key={program.id}
+        id={program.id}
         title={program.attributes.program_type_name}
         image={
   Array.isArray(program?.attributes?.img_url?.data) && program.attributes.img_url.data.length > 0
