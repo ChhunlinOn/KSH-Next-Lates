@@ -4,7 +4,7 @@ import { MdArrowForward } from "react-icons/md";
 import type { IconBaseProps } from "react-icons";
 
 interface ProgramBoxProps {
-  id: number;
+  id: string;
   title: string;
   image: string | null;
   level: string | number;
