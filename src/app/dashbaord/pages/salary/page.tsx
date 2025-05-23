@@ -31,7 +31,7 @@ const ResidentList: React.FC = () => {
           Authorization: `Bearer ${TOKEN}`,
         },
       });
-      if (!response.ok) throw new Error('Failed to fetch data');
+      // if (!response.ok) throw new Error('Failed to fetch data');
       const data = await response.json();
       setSearch(data.data);
 
