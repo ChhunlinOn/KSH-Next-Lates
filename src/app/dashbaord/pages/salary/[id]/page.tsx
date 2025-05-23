@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { FaTimes, FaPlus } from "react-icons/fa";
 import Link from 'next/link';
+
 interface SalaryBoxProps {
   month: string;
   day: number;
