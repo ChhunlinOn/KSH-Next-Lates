@@ -12,11 +12,12 @@ const ActivitiesResident = () => {
   dotenv.config();
   const api_url = process.env.NEXT_PUBLIC_API_URL;
   const token = process.env.NEXT_PUBLIC_TOKEN;
-  const params = useParams();
-  const id = params.id;
-  const activityId = params.activityId;
+  const {id} = useParams();
+  const {activityid} = useParams();
+  // const id = params.id;
+  // const activityid = params.activityId;
   console.log(id);
-  console.log(activityId);
+  console.log(activityid);
   const [programInfo, setProgramInfo] = useState<any[]>([]);
   const [filteredProgramInfo, setFilteredProgramInfo] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -34,7 +35,7 @@ const ActivitiesResident = () => {
   const handlefetchActivities = async () => {
     try {
       const response = await fetch(
-        `${api_url}/program-activities/${activityId}?populate=*`, // Replace with your API endpoint
+        `${api_url}/program-activities/${activityid}?populate=*`, // Replace with your API endpoint
         {
           method: "GET",
           headers: {
@@ -56,12 +57,6 @@ const ActivitiesResident = () => {
 
   const title = programActivities.attributes?.program_activity_name || "";
   const image = programActivities.attributes?.img_url.data[0].attributes.url || "https://ui-avatars.com/api/";
-
-  const residentNames = [
-    "Sokha Chan", "Nita Thea", "Dara Kim", "Sophea Lim", "Rachana Em",
-    "Vannak Chea", "Channa Sok", "Malis Neang", "Sokun Nguon",
-    "Rithy Yim", "Dalin Meas", "Nika Leng", "Borey Pich",
-  ];
 
   const handftchprograminfo = async () => {
     try {
