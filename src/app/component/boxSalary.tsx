@@ -1,5 +1,4 @@
 'use client';
-
 import React from 'react';
 import { FaEye } from 'react-icons/fa';
 import Link from 'next/link';

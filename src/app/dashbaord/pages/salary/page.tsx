@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import BoxSalary from '../../../component/boxSalary';
 import { FaPlus, FaTimes, FaSearch } from 'react-icons/fa';
 import dotenv from 'dotenv';
+import axios from 'axios';
 
 dotenv.config();
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -18,7 +19,6 @@ const ResidentList: React.FC = () => {
   const [showAddResidentModal, setShowAddResidentModal] = useState(false);
   const [newResidentData, setNewResidentData] = useState({
     search: '',
-    salary: '',
     date: '',
   });
 
@@ -31,7 +31,6 @@ const ResidentList: React.FC = () => {
           Authorization: `Bearer ${TOKEN}`,
         },
       });
-      // if (!response.ok) throw new Error('Failed to fetch data');
       const data = await response.json();
       setSearch(data.data);
 
@@ -46,6 +45,27 @@ const ResidentList: React.FC = () => {
     } catch (error) {
       console.error('Fetch error:', error);
     }
+  };
+
+  const fetchAllResidents = async () => {
+    try {
+      const response = await fetch(`${API_URL}/beneficiaries?populate=profile_img_url&pagination[page]=1&pagination[pageSize]=1000`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${TOKEN}`,
+        },
+      });
+      const data = await response.json();
+      setSearch(data.data);
+    } catch (error) {
+      console.error('Error fetching all residents:', error);
+    }
+  };
+
+  const handleAddResident = () => {
+    setShowAddResidentModal(true);
+    fetchAllResidents();
   };
 
   useEffect(() => {
@@ -63,25 +83,52 @@ const ResidentList: React.FC = () => {
 
   const handleSelect = (resident: any) => {
     setInput(resident.attributes.fullname_english);
-   
   };
-
-  const handleSubmit = () => {
-    if (newResidentData.search && newResidentData.salary && newResidentData.date) {
-      const newResident = {
-        id: (residents.length + 1).toString(),
-        name: newResidentData.search,
-        salary: newResidentData.salary,
-        date: newResidentData.date,
-        dob: newResidentData.date,
-      };
-      setResidents([...residents, newResident]);
-      setShowAddResidentModal(false);
+  const handleSubmit = async () => {
+    if (newResidentData.search && newResidentData.date) {
+      try {
+        const selectedResident = filteredOptions.find(
+          (r) => r.attributes.fullname_english === newResidentData.search
+        );
+  
+        if (!selectedResident) {
+          alert('Resident not found!');
+          return;
+        }
+  
+        await axios.post(
+          `${API_URL}/internships?populate=*`,
+          {
+            data: {
+              resident: selectedResident.id,
+              date: newResidentData.date,
+            },
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${TOKEN}`,
+            },
+          }
+        );
+  
+  
+        setShowAddResidentModal(false);
+        setNewResidentData({ search: '', date: '' });
+        setInput('');
+  
+        alert('Resident internship saved!');
+      } catch (error) {
+        console.error('Error saving internship:', error);
+        alert('Failed to save internship. Please try again.');
+      }
     } else {
       alert('Please fill out all fields!');
     }
   };
-
+  
+  
+  
   const residentsPerPage = 10;
   const filteredResidents = residents.filter((resident) =>
     resident.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -101,10 +148,6 @@ const ResidentList: React.FC = () => {
 
   const prevPage = () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
-  };
-
-  const handleAddResident = () => {
-    setShowAddResidentModal(true);
   };
 
   const handleCloseModal = () => {
@@ -136,6 +179,7 @@ const ResidentList: React.FC = () => {
     }
     return age;
   };
+
   return (
     <div className="flex justify-center w-full">
       <div className="w-[95%] max-w-screen-xl min-h-screen bg-gradient-to-b py-10 px-6 relative">
@@ -170,13 +214,12 @@ const ResidentList: React.FC = () => {
           {currentResidents.length > 0 ? (
             currentResidents.map((resident) => (
               <BoxSalary
-              key={resident.id}
-              id={resident.id}
-              image={resident.image}
-              name={resident.name}
-              age={calculateAge(resident.dob) ?? 0}
-            />
-            
+                key={resident.id}
+                id={resident.id}
+                image={resident.image}
+                name={resident.name}
+                age={calculateAge(resident.dob) ?? 0}
+              />
             ))
           ) : (
             <div className="col-span-full text-center text-gray-500 font-medium">
@@ -205,8 +248,6 @@ const ResidentList: React.FC = () => {
           </button>
         </div>
 
-
-
         <div
           onClick={handleAddResident}
           className="flex items-center justify-center gap-2 p-4 bg-white rounded-lg shadow cursor-pointer border border-dashed border-gray-400 hover:bg-gray-50 mt-5"
@@ -215,68 +256,93 @@ const ResidentList: React.FC = () => {
           <span className="text-sm font-medium text-green-600">Add New Resident</span>
         </div>
 
-{showAddResidentModal && (
-    
-
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-2 sm:px-4">
+        {showAddResidentModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-2 sm:px-4">
             <div className="relative w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl p-6 bg-white rounded-2xl shadow-2xl">
-            <button
-              onClick={handleCloseModal}
-              className="absolute top-3 right-4 text-2xl text-gray-500 hover:text-red-500"
-            >
-              &times;
-            </button>
-            <h3 className="text-2xl font-bold text-center mb-6 text-gray-800">Add New Resident</h3>
-
-            <div className="flex flex-col gap-4">
-              <input
-                type="text"
-                name="search"
-                placeholder="Enter resident name"
-                value={newResidentData.search}
-                onChange={handleInputChange}
-                className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
-              <input
-                type="number"
-                name="salary"
-                placeholder="Enter salary"
-                value={newResidentData.salary}
-                onChange={handleInputChange}
-                className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
-              <input
-                type="date"
-                name="date"
-                value={newResidentData.date}
-                onChange={handleInputChange}
-                className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
-            </div>
-
-            <div className="flex flex-col sm:flex-row justify-between gap-4 mt-6">
               <button
                 onClick={handleCloseModal}
-                className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-5 py-2 rounded-md w-full sm:w-auto"
+                className="absolute top-3 right-4 text-2xl text-gray-500 hover:text-red-500"
               >
-                Cancel
+                &times;
               </button>
-              <button
-                onClick={handleSubmit}
-                className="bg-green-800 hover:bg-green-700 text-white px-5 py-2 rounded-md w-full sm:w-auto"
-              >
-                Add
-              </button>
+              <h3 className="text-2xl font-bold text-center mb-6 text-gray-800">Add New Resident</h3>
+
+              <div className="flex flex-col gap-4">
+              <div className="relative w-full">
+  <input
+    type="text"
+    name="search"
+    placeholder="Enter resident name"
+    value={newResidentData.search}
+    onChange={(e) => {
+      handleInputChange(e);
+      setInput(e.target.value);
+    }}
+    className="w-full p-3 border border-green-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+  />
+
+  {input && (
+    <ul className="absolute top-full left-0 w-full z-10 bg-white border border-gray-300 rounded-lg mt-1 max-h-60 overflow-y-auto shadow-md">
+      {filteredOptions.length > 0 ? (
+        filteredOptions.map((resident) => (
+          <li
+            key={resident.id}
+            onClick={() => {
+              handleSelect(resident);
+              setNewResidentData((prev) => ({
+                ...prev,
+                search: resident.attributes.fullname_english,
+              }));
+              setInput('');
+            }}
+            className="flex items-center gap-3 px-4 py-2 hover:bg-green-100 cursor-pointer"
+          >
+            <img
+              src={resident.attributes.profile_img_url?.data?.attributes?.url || 'default.jpg'}
+              alt={resident.attributes.fullname_english}
+              className="w-8 h-8 rounded-full object-cover"
+            />
+            <span>{resident.attributes.fullname_english}</span>
+          </li>
+        ))
+      ) : (
+        <li className="px-4 py-2 text-gray-500">No matches found</li>
+      )}
+    </ul>
+  )}
+</div>
+
+                <input
+                  type="date"
+                  name="date"
+                  value={newResidentData.date}
+                  onChange={handleInputChange}
+                  className="p-3 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+        <div className="flex flex-col sm:flex-row justify-between gap-4 mt-6">
+                       <button
+                         onClick={handleCloseModal}
+                         className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-5 py-2 rounded-md w-full sm:w-auto flex items-center justify-center gap-2"
+                       >
+                         <FaTimes className="text-sm" />
+                         Cancel
+                       </button>
+                       <button
+                         onClick={handleSubmit}
+                         className="bg-green-700 hover:bg-green-800 text-white px-5 py-2 rounded-md w-full sm:w-auto"
+                       >
+                         Save
+                       </button>
+                     </div>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
       </div>
     </div>
   );
 };
 
 export default ResidentList;
-
 
 
