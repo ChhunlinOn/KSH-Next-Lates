@@ -2,10 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import BoxSalary from '../../../component/boxSalary';
 import { FaPlus, FaTimes, FaSearch } from 'react-icons/fa';
-import dotenv from 'dotenv';
 import axios from 'axios';
 
-dotenv.config();
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const TOKEN = process.env.NEXT_PUBLIC_TOKEN;
 
@@ -18,11 +16,11 @@ const ResidentList: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [showAddResidentModal, setShowAddResidentModal] = useState(false);
   const [newResidentData, setNewResidentData] = useState({
-    search: '',
+    resident: '',
     date: '',
   });
 
-  const fectchResident = async () => {
+  const fetchResident = async () => {
     try {
       const response = await fetch(`${API_URL}/internships?populate[resident][populate]=profile_img_url&populate[date]=*`, {
         method: 'GET',
@@ -33,7 +31,6 @@ const ResidentList: React.FC = () => {
       });
       const data = await response.json();
       setSearch(data.data);
-
       const transformed = data.data.map((item: any) => ({
         id: item.id,
         name: item.attributes?.resident?.data?.attributes?.fullname_english || 'No Name',
@@ -69,7 +66,7 @@ const ResidentList: React.FC = () => {
   };
 
   useEffect(() => {
-    fectchResident();
+    fetchResident();
   }, []);
 
   const getFilteredOptions = () => {
@@ -83,109 +80,85 @@ const ResidentList: React.FC = () => {
 
   const handleSelect = (resident: any) => {
     setInput(resident.attributes.fullname_english);
+    setNewResidentData((prev) => ({ ...prev, resident: resident.attributes.fullname_english }));
   };
+
   const handleSubmit = async () => {
-    if (newResidentData.search && newResidentData.date) {
-      try {
-        const selectedResident = filteredOptions.find(
-          (r) => r.attributes.fullname_english === newResidentData.search
-        );
-  
-        if (!selectedResident) {
-          alert('Resident not found!');
-          return;
-        }
-  
-        await axios.post(
-          `${API_URL}/internships?populate=*`,
-          {
-            data: {
-              resident: selectedResident.id,
-              date: newResidentData.date,
-            },
-          },
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${TOKEN}`,
-            },
-          }
-        );
-  
-  
-        setShowAddResidentModal(false);
-        setNewResidentData({ search: '', date: '' });
-        setInput('');
-  
-        alert('Resident internship saved!');
-      } catch (error) {
-        console.error('Error saving internship:', error);
-        alert('Failed to save internship. Please try again.');
+    try {
+      const selectedResident = filteredOptions.find(
+        (r) => r.attributes.fullname_english === newResidentData.resident
+      );
+      if (!selectedResident) {
+        alert('Resident not found!');
+        return;
       }
-    } else {
-      alert('Please fill out all fields!');
+  
+      const payload = {
+        data: {
+          resident: selectedResident.id,
+          date: [newResidentData.date],  
+        },
+      };
+  
+      console.log('Sending payload:', payload);
+  
+      const response = await axios.post(
+        `${API_URL}/internships?populate=*`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${TOKEN}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+  
+      alert('Saved successfully!');
+  
+    } catch (error) {
+      console.error('Error saving internship:', error);
+      alert('Failed to save internship. Check console for details.');
     }
   };
   
   
-  
+
   const residentsPerPage = 10;
   const filteredResidents = residents.filter((resident) =>
     resident.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  const totalResidents = filteredResidents.length;
-  const totalPages = Math.ceil(totalResidents / residentsPerPage);
-
+  const totalPages = Math.ceil(filteredResidents.length / residentsPerPage);
   const currentResidents = filteredResidents.slice(
     (currentPage - 1) * residentsPerPage,
     currentPage * residentsPerPage
   );
 
-  const nextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-  };
-
-  const prevPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
-  };
-
-  const handleCloseModal = () => {
-    setShowAddResidentModal(false);
-  };
-
+  const nextPage = () => currentPage < totalPages && setCurrentPage(currentPage + 1);
+  const prevPage = () => currentPage > 1 && setCurrentPage(currentPage - 1);
+  const handleCloseModal = () => setShowAddResidentModal(false);
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setNewResidentData((prevData) => ({ ...prevData, [name]: value }));
+    setNewResidentData((prev) => ({ ...prev, [name]: value }));
   };
-
   const handleSearch = () => {
     setCurrentPage(1);
     setSearchTerm(searchName.trim());
   };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') handleSearch();
-  };
-
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleSearch();
   const calculateAge = (dob: string): number => {
     if (!dob) return 0;
     const birthDate = new Date(dob);
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
     const m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
     return age;
   };
 
   return (
     <div className="flex justify-center w-full">
-      <div className="w-[95%] max-w-screen-xl min-h-screen bg-gradient-to-b py-10 px-6 relative">
-        <h1 className="text-xl sm:text-3xl md:text-4xl font-extrabold text-center text-green-800 mb-6 drop-shadow-md">
-          Salary
-        </h1>
+      <div className="w-[95%] max-w-screen-xl min-h-screen bg-white py-10 px-6 relative">
+        <h1 className="text-3xl font-bold text-center text-green-700 mb-6">Resident List</h1>
 
         <div className="flex flex-nowrap items-center gap-2 w-full lg:w-auto mb-4">
           <input
@@ -210,7 +183,7 @@ const ResidentList: React.FC = () => {
           </button>
         </div>
 
-        <div className="flex flex-col gap-5 object-cover">
+        <div className="space-y-4">
           {currentResidents.length > 0 ? (
             currentResidents.map((resident) => (
               <BoxSalary
@@ -222,30 +195,22 @@ const ResidentList: React.FC = () => {
               />
             ))
           ) : (
-            <div className="col-span-full text-center text-gray-500 font-medium">
-              No residents found.
-            </div>
+            <p className="text-center text-gray-500">No residents found.</p>
           )}
         </div>
 
-        <div className="flex justify-center items-center mt-8 gap-4 flex-wrap">
+        <div className="flex justify-center items-center mt-8 gap-4">
           <button
             onClick={prevPage}
             disabled={currentPage === 1}
-            className={`px-4 py-2 rounded-md text-white ${currentPage === 1 ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#207137]'}`}
-          >
-            Previous
-          </button>
-          <span className="text-base font-medium">
-            Page {currentPage} of {totalPages}
-          </span>
+            className={`px-4 py-2 rounded-md text-white ${currentPage === 1 ? 'bg-gray-400' : 'bg-green-700'}`}
+          >Previous</button>
+          <span className="text-sm">Page {currentPage} of {totalPages}</span>
           <button
             onClick={nextPage}
             disabled={currentPage === totalPages}
-            className={`px-4 py-2 rounded-md text-white ${currentPage === totalPages ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#207137]'}`}
-          >
-            Next
-          </button>
+            className={`px-4 py-2 rounded-md text-white ${currentPage === totalPages ? 'bg-gray-400' : 'bg-green-700'}`}
+          >Next</button>
         </div>
 
         <div
@@ -268,81 +233,65 @@ const ResidentList: React.FC = () => {
               <h3 className="text-2xl font-bold text-center mb-6 text-gray-800">Add New Resident</h3>
 
               <div className="flex flex-col gap-4">
-              <div className="relative w-full">
-  <input
-    type="text"
-    name="search"
-    placeholder="Enter resident name"
-    value={newResidentData.search}
-    onChange={(e) => {
-      handleInputChange(e);
-      setInput(e.target.value);
-    }}
-    className="w-full p-3 border border-green-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-  />
-
-  {input && (
-    <ul className="absolute top-full left-0 w-full z-10 bg-white border border-gray-300 rounded-lg mt-1 max-h-60 overflow-y-auto shadow-md">
-      {filteredOptions.length > 0 ? (
-        filteredOptions.map((resident) => (
-          <li
-            key={resident.id}
-            onClick={() => {
-              handleSelect(resident);
-              setNewResidentData((prev) => ({
-                ...prev,
-                search: resident.attributes.fullname_english,
-              }));
-              setInput('');
-            }}
-            className="flex items-center gap-3 px-4 py-2 hover:bg-green-100 cursor-pointer"
-          >
-            <img
-              src={resident.attributes.profile_img_url?.data?.attributes?.url || 'default.jpg'}
-              alt={resident.attributes.fullname_english}
-              className="w-8 h-8 rounded-full object-cover"
-            />
-            <span>{resident.attributes.fullname_english}</span>
-          </li>
-        ))
-      ) : (
-        <li className="px-4 py-2 text-gray-500">No matches found</li>
-      )}
-    </ul>
-  )}
-</div>
-
-                <input
-                  type="date"
-                  name="date"
-                  value={newResidentData.date}
-                  onChange={handleInputChange}
-                  className="p-3 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-green-500"
-                />
-        <div className="flex flex-col sm:flex-row justify-between gap-4 mt-6">
-                       <button
-                         onClick={handleCloseModal}
-                         className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-5 py-2 rounded-md w-full sm:w-auto flex items-center justify-center gap-2"
-                       >
-                         <FaTimes className="text-sm" />
-                         Cancel
-                       </button>
-                       <button
-                         onClick={handleSubmit}
-                         className="bg-green-700 hover:bg-green-800 text-white px-5 py-2 rounded-md w-full sm:w-auto"
-                       >
-                         Save
-                       </button>
-                     </div>
+                <div className="relative w-full">
+                  <input
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="Search resident..."
+                    className="w-full border border-gray-400 rounded-md px-3 py-2 mb-2"
+                  />
+                  {filteredOptions.length > 0 && (
+                    <ul className="max-h-32 overflow-y-auto border border-gray-200 rounded-md mb-4">
+                      {filteredOptions.map((resident) => (
+                        <li
+                          key={resident.id}
+                          onClick={() => handleSelect(resident)}
+                          className="flex items-center gap-2 p-2 cursor-pointer hover:bg-gray-100"
+                        >
+                          {resident.attributes.profile_img_url?.data?.attributes?.url && (
+                            <img
+                              src={resident.attributes.profile_img_url.data.attributes.url}
+                              alt=""
+                              className="w-8 h-8 rounded-full object-cover"
+                            />
+                          )}
+                          {resident.attributes.fullname_english}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  <input
+                    type="date"
+                    name="date"
+                    value={newResidentData.date}
+                    onChange={handleInputChange}
+                    className="w-full border border-gray-400 rounded-md px-3 py-2 mb-4"
+                  />
+                  <div className="flex flex-col sm:flex-row justify-between gap-4 mt-6">
+                    <button
+                      onClick={handleCloseModal}
+                      className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-5 py-2 rounded-md w-full sm:w-auto flex items-center justify-center gap-2"
+                    >
+                      <FaTimes className="text-sm" />
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleSubmit}
+                      className="bg-green-700 hover:bg-green-800 text-white px-5 py-2 rounded-md w-full sm:w-auto flex items-center justify-center gap-2"
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         )}
+
       </div>
     </div>
   );
 };
 
 export default ResidentList;
-
-
