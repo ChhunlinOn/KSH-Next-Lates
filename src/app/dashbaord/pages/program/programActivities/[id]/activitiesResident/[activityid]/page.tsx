@@ -28,6 +28,7 @@ const ActivitiesResident = () => {
   const [loading, setLoading] = useState(true);
   const [programActivities, setProgramActivities] = useState<any>({});
 
+  console.log('programInfo', filteredProgramInfo);
   const itemsPerPage = 4;
   const today = new Date().toISOString().split("T")[0];
   const selectedDate = selectedOption === "today" ? today : customDate;
@@ -61,7 +62,7 @@ const ActivitiesResident = () => {
   const handftchprograminfo = async () => {
     try {
       const response = await fetch(
-        `${api_url}/resident-checklists?filters[checklist_date][$eq]=2025-05-14&filters[program_activity][program_activity_name][$eq]=Clean%20the%20Leaf&populate[program_activity]=true&populate[score_point]=true&populate[resident][populate]=profile_img_url&pagination[page]=1&pagination[pageSize]=100`, // Replace with your API endpoint
+        `${api_url}/resident-checklists?filters[checklist_date][$eq]=2025-05-14&filters[program_activity][program_activity_name][$eq]=${title}&populate[program_activity]=true&populate[score_point]=true&populate[resident][populate]=profile_img_url&pagination[page]=1&pagination[pageSize]=100`, // Replace with your API endpoint
         {
           method: "GET",
           headers: {
@@ -87,7 +88,7 @@ const ActivitiesResident = () => {
       handftchprograminfo();
       setLoading(false);
     }, 500);
-  }, [selectedDate]);
+  }, [selectedDate,title]);
 
   const handleOptionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedOption(e.target.value);
@@ -103,9 +104,69 @@ const ActivitiesResident = () => {
     );
   };
 
-  const handleSave = () => {
-    toast.success("Saved successfully!", { position: "top-center" });
-  };
+  const handleCommentChange = (id: number, comment: string) => {
+    setFilteredProgramInfo((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, comment } : p))
+    );
+  }
+
+const handleSave = async () => {
+  try {
+    const promises = filteredProgramInfo.map(async (program) => {
+      const id = program.id;
+      const currentScore = program.attributes?.score_point?.data?.attributes?.score_point;
+      const currentComment = program.attributes?.description;
+
+      const value = program.value || `${currentScore}%` || "1";
+      const comment = program.comment || currentComment || "";
+
+      const score_point = value === "1" ? 1 : value === "3" ? 3 : 2;
+
+      const response = await fetch(`${api_url}/resident-checklists/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          data: {
+            score_point,
+            description: comment,
+          },
+        }),
+      });
+      console.log("Sending to ID:", id, {
+  score_point,
+  description: comment,
+});
+
+
+      return response;
+    });
+
+    const responses = await Promise.all(promises);
+    const allSuccessful = responses.every((res) => res.ok);
+
+    if (allSuccessful) {
+      toast.success("All residents saved successfully!", {
+        position: "top-center",
+        autoClose: 5000,
+      });
+    } else {
+      toast.error("Some saves may have failed. Please check again.", {
+        position: "top-center",
+        autoClose: 5000,
+      });
+    }
+  } catch (error) {
+    toast.error("Failed to save the data. Please try again.", {
+      position: "top-center",
+      autoClose: 5000,
+    });
+    console.error("Error updating resident-checklists:", error);
+  }
+};
+
 
   const handleSearch = () => {
     const term = searchName.trim().toLowerCase();
@@ -238,8 +299,10 @@ const ActivitiesResident = () => {
         "https://ui-avatars.com/api/?name=No+Image"
       }
       name={program.attributes.resident.data.attributes.fullname_english}
-      initialValue={program.value}
+      score={program.value ||program.attributes.score_point.data.id || "1"}
+      coment={program.comment || program.attributes.description || "No comment"}
       onValueChange={(val: string) => handleValueChange(program.id, val)}
+      onCommentChange={(comment: string) => handleCommentChange(program.id, comment)}
     />
   ))
 )}

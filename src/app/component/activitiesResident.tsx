@@ -3,7 +3,8 @@ import React from "react";
 type ProgramBoxProps = {
   profile: string;
   name: string;
-  initialValue: string;
+  score: string;
+  coment: string;
   onValueChange: (val: string) => void;
   onCommentChange?: (comment: string) => void;
 };
@@ -11,7 +12,8 @@ type ProgramBoxProps = {
 const ProgramInfoBox: React.FC<ProgramBoxProps> = ({
   profile,
   name,
-  initialValue,
+  score,
+  coment,
   onValueChange,
   onCommentChange,
 }) => {
@@ -32,19 +34,20 @@ const ProgramInfoBox: React.FC<ProgramBoxProps> = ({
 
           <div className="w-full md:w-1/3">
             <select
-              value={initialValue}
+              value={score}
               onChange={(e) => onValueChange(e.target.value)}
               className="w-full border border-gray-300 rounded-xl px-4 py-3 text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm text-base"
             >
-              <option value="Good">✅ Good</option>
-              <option value="50/50">🔄 50/50</option>
-              <option value="Not Good">❌ Not Good</option>
-              <option value="??">❓ Uncheckable</option>
+              <option value="1">✅ Good</option>
+              <option value="3">🔄 50/50</option>
+              <option value="2">❌ Not Good</option>
+              <option value="4">❓ Uncheckable</option>
             </select>
           </div>
 
           <div className="w-full md:w-1/3">
             <input
+              value={coment}
               type="text"
               placeholder="Write comment..."
               onChange={(e) => onCommentChange?.(e.target.value)}
