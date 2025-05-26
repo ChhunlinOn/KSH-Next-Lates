@@ -77,17 +77,14 @@ console.log(id);
     }
   };
 
-  // console.log('resident id',residentMedical.resident?.data.id);
 
   const residentid = residentMedical?.resident?.data.id || null;
   console.log('resident id', residentid);
 
-// Fetch resident medical info on mount
 useEffect(() => {
   handlefetchResident();
 }, []);
 
-// Fetch resident details when residentid is available
 useEffect(() => {
   if (residentid) {
     handleResidentdata();
@@ -95,7 +92,7 @@ useEffect(() => {
 }, [residentid]);
 
 const handleResidentdata = async () => {
-  if (!residentid) return; // Guard: don't run if id is not ready
+  if (!residentid) return; 
   try {
     const response = await fetch(
       `${api_url}/beneficiaries/${residentid}?populate=*`,
@@ -111,7 +108,6 @@ const handleResidentdata = async () => {
       throw new Error('Network response was not ok');
     }
     const data = await response.json();
-    // You can set state here if needed, e.g. setResidentInfo(data.data.attributes);
     setResidentImg(data.data?.attributes?.profile_img_url?.data?.attributes?.url);
   } catch (error) {
     console.error('Error fetching resident data:', error);
@@ -230,8 +226,8 @@ const handleResidentdata = async () => {
       </div>
 
       {showAddResidentModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4 overflow-y-auto">
-          <div className="relative w-full max-w-md bg-white rounded-2xl p-6 shadow-lg my-12">
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-2 sm:px-4">
+            <div className="relative w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl p-6 bg-white rounded-2xl shadow-2xl">
             <button
               onClick={handleCloseModal}
               className="absolute top-3 right-4 text-2xl text-gray-500 hover:text-red-500"
