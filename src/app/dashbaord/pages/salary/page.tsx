@@ -85,18 +85,27 @@ const ResidentList: React.FC = () => {
 
   const handleSubmit = async () => {
     try {
+      console.log('Submitted data:', newResidentData);
+  
       const selectedResident = filteredOptions.find(
         (r) => r.attributes.fullname_english === newResidentData.resident
       );
+  
       if (!selectedResident) {
         alert('Resident not found!');
+        return;
+      }
+  
+      const duplicate = residents.find((r) => r.name === newResidentData.resident);
+      if (duplicate) {
+        alert('This resident has already been added.');
         return;
       }
   
       const payload = {
         data: {
           resident: selectedResident.id,
-          date: [newResidentData.date],  
+          date: [],
         },
       };
   
@@ -113,13 +122,19 @@ const ResidentList: React.FC = () => {
         }
       );
   
-      alert('Saved successfully!');
+      console.log('API Response:', response.data);
+  
+      fetchResident();
+      setShowAddResidentModal(false);
+      setInput('');
+      setNewResidentData({ resident: '', date: '' });
   
     } catch (error) {
       console.error('Error saving internship:', error);
       alert('Failed to save internship. Check console for details.');
     }
   };
+  
   
   
 
@@ -158,7 +173,9 @@ const ResidentList: React.FC = () => {
   return (
     <div className="flex justify-center w-full">
       <div className="w-[95%] max-w-screen-xl min-h-screen bg-white py-10 px-6 relative">
-        <h1 className="text-3xl font-bold text-center text-green-700 mb-6">Resident List</h1>
+      <h1 className="text-xl sm:text-3xl md:text-4xl font-extrabold text-center text-green-800 mb-6 drop-shadow-md">
+    Resident Salary
+  </h1>
 
         <div className="flex flex-nowrap items-center gap-2 w-full lg:w-auto mb-4">
           <input
