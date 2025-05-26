@@ -7,13 +7,14 @@ import { FaSearch } from "react-icons/fa";
 import Link from "next/link";
 import dotenv from "dotenv";
 import { useParams } from "next/navigation";
+import { downloadExcel } from "react-export-table-to-excel";
 
 const ActivitiesResident = () => {
   dotenv.config();
   const api_url = process.env.NEXT_PUBLIC_API_URL;
   const token = process.env.NEXT_PUBLIC_TOKEN;
-  const {id} = useParams();
-  const {activityid} = useParams();
+  const { id } = useParams();
+  const { activityid } = useParams();
   // const id = params.id;
   // const activityid = params.activityId;
   console.log(id);
@@ -32,6 +33,7 @@ const ActivitiesResident = () => {
   const itemsPerPage = 4;
   const today = new Date().toISOString().split("T")[0];
   const selectedDate = selectedOption === "today" ? today : customDate;
+  
 
   const handlefetchActivities = async () => {
     try {
@@ -60,25 +62,31 @@ const ActivitiesResident = () => {
   const image = programActivities.attributes?.img_url.data[0].attributes.url || "https://ui-avatars.com/api/";
 
   const handftchprograminfo = async () => {
-    try {
-      const response = await fetch(
-        `${api_url}/resident-checklists?filters[checklist_date][$eq]=2025-05-14&filters[program_activity][program_activity_name][$eq]=${title}&populate[program_activity]=true&populate[score_point]=true&populate[resident][populate]=profile_img_url&pagination[page]=1&pagination[pageSize]=100`, // Replace with your API endpoint
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`, // Replace with your API token
-          },
-        }
-      );
-      const data = await response.json();
-      console.log(data.data);
-      setProgramInfo(data.data || []);
-      setFilteredProgramInfo(data.data || []);
-      setTotalPages(Math.ceil((data.data.length || 0) / itemsPerPage));
-    } catch (error) {
-      console.error("Error fetching activities:", error);
-    }
-  };
+  try {
+    const response = await fetch(
+      `${api_url}/resident-checklists?filters[checklist_date][$eq]=${selectedDate}&filters[program_activity][program_activity_name][$eq]=${title}&populate[program_activity]=true&populate[score_point]=true&populate[resident][populate]=profile_img_url&pagination[page]=1&pagination[pageSize]=100`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    const data = await response.json();
+    console.log(data.data);
+
+    // Null/undefined check
+    const safeData = Array.isArray(data.data) ? data.data : [];
+    setProgramInfo(safeData);
+    setFilteredProgramInfo(safeData);
+    setTotalPages(Math.ceil(safeData.length / itemsPerPage));
+  } catch (error) {
+    console.error("Error fetching activities:", error);
+    setProgramInfo([]);
+    setFilteredProgramInfo([]);
+    setTotalPages(1);
+  }
+};
 
   useEffect(() => {
     setLoading(true);
@@ -88,7 +96,7 @@ const ActivitiesResident = () => {
       handftchprograminfo();
       setLoading(false);
     }, 500);
-  }, [selectedDate,title]);
+  }, [selectedDate, title]);
 
   const handleOptionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedOption(e.target.value);
@@ -110,62 +118,62 @@ const ActivitiesResident = () => {
     );
   }
 
-const handleSave = async () => {
-  try {
-    const promises = filteredProgramInfo.map(async (program) => {
-      const id = program.id;
-      const currentScore = program.attributes?.score_point?.data?.attributes?.score_point;
-      const currentComment = program.attributes?.description;
+  const handleSave = async () => {
+    try {
+      const promises = filteredProgramInfo.map(async (program) => {
+        const id = program.id;
+        const currentScore = program.attributes?.score_point?.data?.attributes?.score_point;
+        const currentComment = program.attributes?.description;
 
-      const value = program.value || `${currentScore}%` || "1";
-      const comment = program.comment || currentComment || "";
+        const value = program.value || `${currentScore}%` || "1";
+        const comment = program.comment || currentComment || "";
 
-      const score_point = value === "1" ? 1 : value === "3" ? 3 : 2;
+        const score_point = value === "1" ? 1 : value === "3" ? 3 : 2;
 
-      const response = await fetch(`${api_url}/resident-checklists/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          data: {
-            score_point,
-            description: comment,
+        const response = await fetch(`${api_url}/resident-checklists/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
-        }),
+          body: JSON.stringify({
+            data: {
+              score_point,
+              description: comment,
+            },
+          }),
+        });
+        console.log("Sending to ID:", id, {
+          score_point,
+          description: comment,
+        });
+
+
+        return response;
       });
-      console.log("Sending to ID:", id, {
-  score_point,
-  description: comment,
-});
 
+      const responses = await Promise.all(promises);
+      const allSuccessful = responses.every((res) => res.ok);
 
-      return response;
-    });
-
-    const responses = await Promise.all(promises);
-    const allSuccessful = responses.every((res) => res.ok);
-
-    if (allSuccessful) {
-      toast.success("All residents saved successfully!", {
+      if (allSuccessful) {
+        toast.success("All residents saved successfully!", {
+          position: "top-center",
+          autoClose: 5000,
+        });
+      } else {
+        toast.error("Some saves may have failed. Please check again.", {
+          position: "top-center",
+          autoClose: 5000,
+        });
+      }
+    } catch (error) {
+      toast.error("Failed to save the data. Please try again.", {
         position: "top-center",
         autoClose: 5000,
       });
-    } else {
-      toast.error("Some saves may have failed. Please check again.", {
-        position: "top-center",
-        autoClose: 5000,
-      });
+      console.error("Error updating resident-checklists:", error);
     }
-  } catch (error) {
-    toast.error("Failed to save the data. Please try again.", {
-      position: "top-center",
-      autoClose: 5000,
-    });
-    console.error("Error updating resident-checklists:", error);
-  }
-};
+  };
 
 
   const handleSearch = () => {
@@ -190,6 +198,32 @@ const handleSave = async () => {
     const start = (currentPage - 1) * itemsPerPage;
     return filteredProgramInfo.slice(start, start + itemsPerPage);
   };
+
+  
+
+const handleDownload = () => {
+  downloadExcel({
+    fileName: "resident-checklist",
+    sheet: "Sheet1",
+    tablePayload: {
+      header: ["Name", "Score", "Comment"],
+      body: filteredProgramInfo.map((program) => [
+        program.attributes.resident.data.attributes.fullname_english,
+        program.value
+          ? program.value === 1
+            ? "Good"
+            : program.value === 2
+            ? "Bad"
+            : program.value === 3
+            ? "Medium"
+            : "Uncheckable"
+          : program.attributes.score_point?.data?.attributes?.score_name || "Uncheckable",
+        program.comment || program.attributes.description || "No comment",
+      ]),
+    },
+  });
+};
+
 
   return (
     <div className="min-h-screen py-6 px-4 sm:px-6 lg:px-12 ">
@@ -284,28 +318,28 @@ const handleSave = async () => {
           <table className="w-full  rounded-lg shadow-sm">
             <tbody>
               {getPaginatedData().length === 0 ? (
-  <tr>
-    <td colSpan={4} className="text-center py-8 text-gray-500 text-lg">
-      There no resident to checklist on this date
-    </td>
-  </tr>
-) : (
-  getPaginatedData().map((program) => (
-    <ProgramInfoBox
-      key={program.id}
-      profile={
-        program.attributes.resident.data.attributes
-          .profile_img_url?.data?.attributes?.formats?.thumbnail?.url ||
-        "https://ui-avatars.com/api/?name=No+Image"
-      }
-      name={program.attributes.resident.data.attributes.fullname_english}
-      score={program.value ||program.attributes.score_point.data.id || "1"}
-      coment={program.comment || program.attributes.description || "No comment"}
-      onValueChange={(val: string) => handleValueChange(program.id, val)}
-      onCommentChange={(comment: string) => handleCommentChange(program.id, comment)}
-    />
-  ))
-)}
+                <tr>
+                  <td colSpan={4} className="text-center py-8 text-gray-500 text-lg">
+                    There no resident to checklist on this date
+                  </td>
+                </tr>
+              ) : (
+                getPaginatedData().map((program) => (
+                  <ProgramInfoBox
+                    key={program.id}
+                    profile={
+                      program.attributes.resident.data.attributes
+                        .profile_img_url?.data?.attributes?.formats?.thumbnail?.url ||
+                      "https://ui-avatars.com/api/?name=No+Image"
+                    }
+                    name={program.attributes.resident.data.attributes.fullname_english}
+                    score={program.value || program.attributes.score_point.data.id || "1"}
+                    coment={program.comment || program.attributes.description || "No comment"}
+                    onValueChange={(val: string) => handleValueChange(program.id, val)}
+                    onCommentChange={(comment: string) => handleCommentChange(program.id, comment)}
+                  />
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -316,8 +350,8 @@ const handleSave = async () => {
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
               className={`px-4 py-2 rounded-md text-white ${currentPage === 1
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-green-700 hover:bg-green-800"
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-green-700 hover:bg-green-800"
                 }`}
             >
               Previous
@@ -333,15 +367,21 @@ const handleSave = async () => {
               }
               disabled={currentPage === totalPages}
               className={`px-4 py-2 rounded-md text-white ${currentPage === totalPages
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-green-700 hover:bg-green-800"
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-green-700 hover:bg-green-800"
                 }`}
             >
               Next
             </button>
           </div>
 
-          <div className="w-full flex justify-end">
+          <div className="w-full flex justify-between items-center gap-4">
+            <button
+              onClick={handleDownload}
+              className="bg-green-700 hover:bg-green-800 active:bg-green-900 text-white font-semibold text-lg px-6 py-2 rounded-lg shadow-md transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-opacity-75 w-full sm:w-full md:w-auto max-w-full sm:max-w-full md:max-w-xs"
+            >
+              Export
+            </button>
             <button
               onClick={handleSave}
               className="bg-green-700 hover:bg-green-800 active:bg-green-900 text-white font-semibold text-lg px-6 py-2 rounded-lg shadow-md transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-opacity-75 w-full sm:w-full md:w-auto max-w-full sm:max-w-full md:max-w-xs"
