@@ -20,6 +20,13 @@ const MedicalList: React.FC = () => {
   const [newResidentData, setNewResidentData] = useState({
     name: '',
     medicalUse: false,
+    doctor: '',
+    treatment_date: '',
+    specialist_doctor_comment: '',
+    next_appointment: '',
+    next_appointment_time: '',
+    next_appointment_remark: '',
+    medical_treatment: '',
   });
 
   const handlefetchResidents = async () => {
@@ -79,28 +86,25 @@ const MedicalList: React.FC = () => {
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setNewResidentData((prevData) => ({
-      ...prevData,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
-  };
+const handleInputChange = (
+  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+) => {
+  const { name, value } = e.target;
+  setNewResidentData((prevData) => ({
+    ...prevData,
+    [name]: value,
+  }));
+};
 
 
   const handleSubmit = async () => {
-    const { name, medicalUse } = newResidentData;
     const selectedResident = allResidents.find(
-      (res) => res.attributes.fullname_english === name
+      (res) => res.attributes.fullname_english === newResidentData.name
     );
-  
-    if (!selectedResident) {
-      alert('Resident not found!');
-      return;
-    }
-  
+    if (!selectedResident) return alert('Resident not found');
+
     try {
-      const response = await fetch(`${api_url}/resident-medicals?filters[require_to_use][$eq]=true&populate[resident][populate]=profile_img_url`, {
+      const response = await fetch(`${api_url}/resident-medicals`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -108,27 +112,42 @@ const MedicalList: React.FC = () => {
         },
         body: JSON.stringify({
           data: {
-            require_to_use: medicalUse,
+            require_to_use: true,
             resident: selectedResident.id,
+            doctor: newResidentData.doctor,
+            treatment_date: newResidentData.treatment_date,
+            specialist_doctor_comment: newResidentData.specialist_doctor_comment,
+            next_appointment: newResidentData.next_appointment,
+            next_appointment_time: newResidentData.next_appointment_time,
+            next_appointment_remark: newResidentData.next_appointment_remark,
+            medical_treatment: newResidentData.medical_treatment,
           },
         }),
       });
-  
+
       if (response.ok) {
-        await handlefetchResidents(); 
+        await handlefetchResidents();
         setShowAddResidentModal(false);
-        setNewResidentData({ name: '', medicalUse: false });
+        setNewResidentData({
+          name: '',
+          medicalUse: false,
+          doctor: '',
+          treatment_date: '',
+          specialist_doctor_comment: '',
+          next_appointment: '',
+          next_appointment_time: '',
+          next_appointment_remark: '',
+          medical_treatment: '',
+        });
         setInput('');
       } else {
-        const errorData = await response.json();
-        console.error('API error:', errorData);
         alert('Failed to add new medical record.');
       }
-    } catch (error) {
-      console.error('Submit error:', error);
-      alert('Error while saving. Please try again.');
+    } catch (err) {
+      alert('Error occurred while submitting.');
     }
   };
+
   
 
   const handleAddResident = () => {
@@ -267,24 +286,18 @@ const MedicalList: React.FC = () => {
         </div>
 
         {showAddResidentModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-2 sm:px-4">
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-2 sm:px-4">
             <div className="relative w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl p-6 bg-white rounded-2xl shadow-2xl">
-              <button
-                onClick={handleCloseModal}
-                className="absolute top-3 right-4 text-2xl text-gray-500 hover:text-red-500"
-              >
-                &times;
-              </button>
-              <h3 className="text-2xl font-bold text-center mb-6 text-gray-800">
-                Add New Medical
-              </h3>
+            <button onClick={() => setShowAddResidentModal(false)} className="absolute top-2 right-3 text-xl">
+              <FaTimes />
+            </button>
+            <h2 className="text-xl font-bold mb-4">Add New Medical Resident</h2>
 
-              <div className="flex flex-col gap-4">
-                <input
+            <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Search resident..."
+                  placeholder="Select resident name"
                   className="w-full border border-gray-400 rounded-md px-3 py-2 mb-2"
                 />
                 {filteredOptions.length > 0 && (
@@ -310,20 +323,87 @@ const MedicalList: React.FC = () => {
                       </li>
                     ))}
                   </ul>
-                )}
+            )}
 
-<div className="flex items-center border border-gray-300 rounded-lg px-4 py-2 w-full">
-  <input
-    type="checkbox"
-    name="medicalUse"
-    checked={newResidentData.medicalUse}
-    onChange={handleInputChange}
-    className="form-checkbox h-5 w-5 text-blue-600"
-  />
-  <label className="ml-3 text-gray-700 select-none">Medical Use</label>
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <div>
+    <label className="block text-sm text-gray-600 mb-1">Doctor</label>
+    <input
+      name="doctor"
+      value={newResidentData.doctor}
+      onChange={handleInputChange}
+      className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+    />
+  </div>
+
+  <div>
+    <label className="block text-sm text-gray-600 mb-1">Treatment Date</label>
+    <input
+      type="date"
+      name="treatment_date"
+      value={newResidentData.treatment_date}
+      onChange={handleInputChange}
+      className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+    />
+  </div>
+
+  <div className="md:col-span-2">
+    <label className="block text-sm text-gray-600 mb-1">Specialist Doctor Comment</label>
+    <textarea
+      name="specialist_doctor_comment"
+      value={newResidentData.specialist_doctor_comment}
+      onChange={handleInputChange}
+      rows={3}
+      className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+    />
+  </div>
+
+  <div>
+    <label className="block text-sm text-gray-600 mb-1">Next Appointment</label>
+    <input
+      type="date"
+      name="next_appointment"
+      value={newResidentData.next_appointment}
+      onChange={handleInputChange}
+      className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+    />
+  </div>
+
+  <div>
+    <label className="block text-sm text-gray-600 mb-1">Next Appointment Time</label>
+    <input
+      type="time"
+      name="next_appointment_time"
+      value={newResidentData.next_appointment_time}
+      onChange={handleInputChange}
+      className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+    />
+  </div>
+
+  <div className="md:col-span-2">
+    <label className="block text-sm text-gray-600 mb-1">Next Appointment Remark</label>
+    <input
+      name="next_appointment_remark"
+      value={newResidentData.next_appointment_remark}
+      onChange={handleInputChange}
+      className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+    />
+  </div>
+
+  <div className="md:col-span-2">
+    <label className="block text-sm text-gray-600 mb-1">Medical Treatment</label>
+    <textarea
+      name="medical_treatment"
+      value={newResidentData.medical_treatment}
+      onChange={handleInputChange}
+      rows={3}
+      className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+    />
+  </div>
 </div>
 
-                <div className="flex flex-col sm:flex-row justify-between gap-4 mt-6">
+
+            <div className="flex flex-col sm:flex-row justify-between gap-4 mt-6">
                   <button
                     onClick={handleCloseModal}
                     className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-5 py-2 rounded-md w-full sm:w-auto flex items-center justify-center gap-2"
@@ -337,11 +417,9 @@ const MedicalList: React.FC = () => {
                   >
                     Save
                   </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+                </div>          </div>
+        </div>
+      )}
       </div>
     </div>
   );
