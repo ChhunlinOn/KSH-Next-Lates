@@ -70,7 +70,7 @@ const ResidentList: React.FC = () => {
     setInput(resident.attributes.fullname_english);
    
   };
-
+  
   const handleSubmit = () => {
     if (newResidentData.search && newResidentData.salary && newResidentData.date) {
       const newResident = {
@@ -86,6 +86,59 @@ const ResidentList: React.FC = () => {
       alert('Please fill out all fields!');
     }
   };
+  const handleSubmit = async () => {
+    try {
+      console.log('Submitted data:', newResidentData);
+  
+      const selectedResident = filteredOptions.find(
+        (r) => r.attributes.fullname_english === newResidentData.resident
+      );
+  
+      if (!selectedResident) {
+        alert('Resident not found!');
+        return;
+      }
+  
+      const duplicate = residents.find((r) => r.name === newResidentData.resident);
+      if (duplicate) {
+        alert('This resident has already been added.');
+        return;
+      }
+  
+      const payload = {
+        data: {
+          resident: selectedResident.id,
+          date: [],
+        },
+      };
+  
+      console.log('Sending payload:', payload);
+  
+      const response = await axios.post(
+        `${API_URL}/internships?populate=*`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${TOKEN}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+  
+      console.log('API Response:', response.data);
+  
+      fetchResident();
+      setShowAddResidentModal(false);
+      setInput('');
+      setNewResidentData({ resident: '', date: '' });
+  
+    } catch (error) {
+      console.error('Error saving internship:', error);
+      alert('Failed to save internship. Check console for details.');
+    }
+  };
+  
+
 
   const residentsPerPage = 10;
   const filteredResidents = residents.filter((resident) =>

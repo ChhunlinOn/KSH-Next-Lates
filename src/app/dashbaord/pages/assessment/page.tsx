@@ -174,6 +174,15 @@ const Assessment: React.FC = () => {
 
   const handleSubmit = async () => {
     if (newAssessmentData.title && newAssessmentData.imageUrl) {
+      const duplicate = assessments.find(
+        (assessment) => assessment.title.toLowerCase() === newAssessmentData.title.toLowerCase()
+      );
+  
+      if (duplicate) {
+        alert('An assessment with this title already exists. Please use a different title.');
+        return; 
+      }
+  
       try {
         await axios.post(
           `${api_url}/assessments`,
