@@ -1026,4 +1026,3 @@ return (
 };
 
 export default MedicalDetailPage;
-
