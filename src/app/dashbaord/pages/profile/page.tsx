@@ -1,59 +1,58 @@
 "use client"
 import { FaUser, FaArrowRight } from "react-icons/fa"
 import Link from "next/link"
-
-const users = [
-  {
-    id: 1,
-    fullName: "Canyon.",
-    email: "john.doe@example.com",
-    role: "Administrator",
-    image:
-      "https://static.vecteezy.com/system/resources/thumbnails/038/962/461/small/ai-generated-caucasian-successful-confident-young-businesswoman-ceo-boss-bank-employee-worker-manager-with-arms-crossed-in-formal-wear-isolated-in-white-background-photo.jpg",
-  },
-  {
-    id: 2,
-    fullName: "Jane Smith",
-    email: "jane.smith@example.com",
-    role: "Manager",
-    image: "https://i.pinimg.com/736x/0e/bd/b9/0ebdb9f8cb628dc5224bd2f84a2ff9e2.jpg",
-  },
-  {
-    id: 3,
-    fullName: "Mark Johnson",
-    email: "mark.j@example.com",
-    role: "Team Lead",
-    image: "https://i.pinimg.com/736x/c5/35/0f/c5350f084e43aa828f0503831ab69912.jpg",
-  },
-  {
-    id: 4,
-    fullName: "Mark Johnson",
-    email: "mark.j@example.com",
-    role: "Team Lead",
-    image: "https://i.pinimg.com/736x/bd/e3/af/bde3afba0942342f02ce5a62f6b0b3c4.jpg",
-  },
-  {
-    id: 5,
-    fullName: "Mark Johnson",
-    email: "mark.j@example.com",
-    role: "Team Lead",
-    image: "https://i.pinimg.com/736x/18/79/73/1879732a4edf5c5c776277a175a8e433.jpg",
-  },
-  {
-    id: 6,
-    fullName: "Mark Johnson",
-    email: "mark.j@example.com",
-    role: "Team Lead",
-    image: "https://i.pinimg.com/736x/57/2b/98/572b9886a26a463fc37672b267946be3.jpg",
-  },
-]
+import { useState,useEffect } from "react"
+import dotenv from "dotenv"
 
 const UserListPage = () => {
+  dotenv.config();
+  const api_url = process.env.NEXT_PUBLIC_API_URL;
+  const token = process.env.NEXT_PUBLIC_TOKEN;
+  type User = {
+  id: number;
+  fullName: string;
+  role: string;
+  email: string;
+  image?: string;
+};
+
+
+const [users, setUsers] = useState<User[]>([]);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch(`${api_url}/users?populate=*`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch users");
+      }
+      const data = await response.json();
+      const formattedData = data.map((user: any) => ({
+        id: user.id,
+        fullName: user.username || "No Name",
+        email: user.email || "No Email",
+        role: user.role.name || "No Role",
+        image: user.profile_img?.url || "/placeholder.svg",
+      }));
+      setUsers(formattedData);
+      console.log("Fetched users:", data);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, [token]);
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-green-50 py-6 sm:py-8 md:py-10 px-4 sm:px-6 relative">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-xl sm:text-3xl md:text-4xl font-extrabold text-center text-green-800 mb-4 sm:mb-6 md:mb-8 drop-shadow-md">
-          Users
+          Staff
         </h1>
 
         {/* Adjusted grid layout for iPad (md) and Nest Hub (xl) */}
@@ -66,17 +65,17 @@ const UserListPage = () => {
               <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 relative">
                 <img
                   src={user.image || "/placeholder.svg"}
-                  alt={user.fullName}
+                  alt={""}
                   className="w-full h-full rounded-full object-cover border-4 border-green-700 shadow"
                   loading="lazy"
                 />
               </div>
               <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-800 mt-3 sm:mt-4">
-                {user.fullName}
+                {user.fullName || " "}
               </h2>
               <p className="text-green-600 font-medium text-sm sm:text-base">{user.role}</p>
               <p className="text-gray-500 text-xs sm:text-sm mt-1 break-words max-w-full">{user.email}</p>
-              <Link href="/dashbaord/pages/profile/profileInfo" className="mt-4 sm:mt-5 md:mt-6">
+              <Link href={`/dashbaord/pages/profile/profileInfo/${user.id}`} className="mt-4 sm:mt-5 md:mt-6">
                 <button className="flex items-center justify-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-green-700 hover:bg-green-800 text-white text-xs sm:text-sm rounded-xl transition">
                   <FaUser className="text-xs sm:text-sm" />
                   View Profile
