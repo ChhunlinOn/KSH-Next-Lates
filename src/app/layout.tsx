@@ -10,9 +10,11 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'Acme Dashboard',
+  title: 'KSH Dashboard',
   description: 'The official Next.js Course Dashboard, built with App Router.',
-  // metadataBase: new URL('https://next-learn-dashboard.vercel.sh'),
+  icons: {
+    icon: 'https://res.cloudinary.com/dq5usncvp/image/upload/v1727160393/photo_2024_09_24_13_43_19_74e3099b67.jpg',
+  },
 };
 
 export default function RootLayout({
