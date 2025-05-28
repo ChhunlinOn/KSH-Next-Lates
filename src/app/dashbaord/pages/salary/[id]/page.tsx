@@ -1,11 +1,15 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import type React from "react"
 import { FaPlus, FaEdit, FaTrash, FaTimes } from "react-icons/fa"
 import Link from "next/link"
 import Image from "next/image"
+import { useParams } from "next/navigation"
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const TOKEN = process.env.NEXT_PUBLIC_TOKEN;
 
 interface SalaryData {
+  id?: number
   month: string
   day: number
   year: number
@@ -25,14 +29,53 @@ const formatDate = (month: string, day: number, year: number) => {
 }
 
 export default function SalaryPage() {
+  const {id} = useParams();
+  console.log("Resident ID:", id);
+  interface Resident {
+    id?: number;
+    name?: string;
+    image?: string;
+    dob?: string;
+    salary?: [];
+  }
+  
+  const [resident, setResident] = useState<Resident>({});
+  
+  const fetchResident = async () => {
+    try {
+      const response = await fetch(`${API_URL}/beneficiaries/${id}?populate=*`,
+         {
+        headers: {
+          Authorization: `Bearer ${TOKEN}`,
+        },
+      });
+      const data = await response.json();
+  
+      const transformed = {
+        id: data.data.id,
+        name: data.data.attributes?.fullname_english || 'No Name',
+        image: data.data.attributes?.profile_img_url?.data?.attributes?.url,
+        dob: data.data.attributes?.date_of_birth,
+        salary: data.data.attributes?.internship_salaries.data || [],
+      };
+  
+      console.log('Fetched residents:', data.data);
+      setResident(transformed);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  useEffect(() => {
+    fetchResident();
+  }, []);
   const salaryData = {
-    fullname_english: "Kim Alysa",
+    fullname_english: resident.name || "No Name",
     profile_img_url: {
       data: {
         attributes: {
           formats: {
             thumbnail: {
-              url: "https://static.vecteezy.com/system/resources/thumbnails/038/974/578/small_2x/ai-generated-professional-portrait-of-a-competent-woman-free-photo.jpg",
+              url: resident.image || "/placeholder.svg",
             },
           },
         },
@@ -43,31 +86,43 @@ export default function SalaryPage() {
   const profileImageUrl = salaryData.profile_img_url?.data?.attributes?.formats?.thumbnail?.url || null
 
   const calculateBalances = (salaries: SalaryData[]): SalaryData[] => {
+    // let runningBalance = 0;
     return salaries.map((salary) => {
+      // runningBalance += salary.amount;
       return {
         ...salary,
-        balance: salary.balance || 0, 
-        comments: salary.comments || "No comments",
-      }
-    })
-  }
+        // balance: runningBalance,
+        comments: salary.comments || 'No comments',
+      };
+    });
+  };
+  const [monthlySalaries, setMonthlySalaries] = useState<SalaryData[]>([]);
 
-  const [monthlySalaries, setMonthlySalaries] = useState<SalaryData[]>(
-    calculateBalances([
-      { month: "January", day: 1, year: 2025, amount: 3500, balance: 3500, comments: "Regular salary" },
-      { month: "February", day: 2, year: 2025, amount: 3500, balance: 7000, comments: "Regular salary" },
-      { month: "March", day: 3, year: 2025, amount: 3800, balance: 10800, comments: "Salary + bonus" },
-      { month: "April", day: 4, year: 2025, amount: 3500, balance: 14300, comments: "Regular salary" },
-      { month: "May", day: 5, year: 2025, amount: 3500, balance: 17800, comments: "Regular salary" },
-      { month: "June", day: 6, year: 2025, amount: 4000, balance: 21800, comments: "Salary + performance bonus" },
-      { month: "July", day: 7, year: 2025, amount: 3500, balance: 25300, comments: "Regular salary" },
-      { month: "August", day: 8, year: 2025, amount: 3500, balance: 28800, comments: "Regular salary" },
-      { month: "September", day: 9, year: 2025, amount: 3500, balance: 32300, comments: "Regular salary" },
-      { month: "October", day: 10, year: 2025, amount: 3700, balance: 36000, comments: "Salary + overtime" },
-      { month: "November", day: 11, year: 2025, amount: 3500, balance: 39500, comments: "Regular salary" },
-      { month: "December", day: 12, year: 2025, amount: 5000, balance: 44500, comments: "Salary + year-end bonus" },
-    ]),
-  )
+  // Recalculate salary balances after resident data is fetched
+  useEffect(() => {
+    if (resident.salary && Array.isArray(resident.salary)) {
+      const rawSalaries = resident.salary.map((s: any) => {
+        const dateStr = s.attributes.date || "2025-01-01"; // Example field name
+        const dateObj = new Date(dateStr);
+      
+        const monthNames = [
+          "January", "February", "March", "April", "May", "June",
+          "July", "August", "September", "October", "November", "December"
+        ];
+      
+        return {
+          month: monthNames[dateObj.getMonth()],  // getMonth returns 0-based index
+          day: dateObj.getDate(),
+          year: dateObj.getFullYear(),
+          amount: s.attributes.salary || 0,
+          balance: s.attributes.balance || 0, // will be calculated
+          comments: s.attributes.commment || "No comments",
+        };
+      });      
+  
+      setMonthlySalaries(calculateBalances(rawSalaries));
+    }
+  }, [resident.salary]);
 
   const [newSalary, setNewSalary] = useState<SalaryData>({
     month: "",
