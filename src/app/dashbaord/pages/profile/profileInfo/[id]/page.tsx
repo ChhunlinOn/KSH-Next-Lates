@@ -228,7 +228,7 @@ const ProfileInfoPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center px-6 py-24 relative">
       <div className="absolute top-8 left-8 z-20">
-        <Link href="/dashboard/pages/profile">
+        <Link href="/dashbaord/pages/profile">
           <button className="bg-gray-500 text-white px-6 py-2 rounded-lg shadow-md hover:bg-gray-400 transition duration-300">
             Back
           </button>

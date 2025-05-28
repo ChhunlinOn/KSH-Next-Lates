@@ -10,9 +10,12 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "KSH",
-  description: "Resident management system for KSH",
-}
+  title: 'KSH Dashboard',
+  description: 'The official Next.js Course Dashboard, built with App Router.',
+  icons: {
+    icon: 'https://res.cloudinary.com/dq5usncvp/image/upload/v1727160393/photo_2024_09_24_13_43_19_74e3099b67.jpg',
+  },
+};
 
 export default function RootLayout({
   children,
