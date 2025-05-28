@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import ProgramInfoBox from "../../../component/residentChecklist";
+import ProgramInfoBox from "../../../../../../component/residentChecklist";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Link from "next/link";
 import { getSessionForClient } from "@/app/action/clientauth";
 import { redirect } from "next/navigation";
+import { useParams } from "next/navigation";
 
 const ResidentChecklist = () => {
   const session = getSessionForClient();
@@ -16,6 +17,7 @@ const ResidentChecklist = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [selectedOption, setSelectedOption] = useState("today");
   const [customDate, setCustomDate] = useState("");
+  const {id} = useParams();
 
   const itemsPerPage = 4;
   const today = new Date().toISOString().split("T")[0];
@@ -105,7 +107,7 @@ const activityNames = [
     <div className="min-h-screen py-10 px-4 md:px-12">
       <div className="max-w-7xl mx-auto w-full">
         <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
-          <Link href="/dashbaord/pages/resident/residentInfo">
+          <Link href={`/dashbaord/pages/resident/residentInfo/${id}`}>
             <button className="bg-gray-500 text-white px-6 py-2 rounded-lg shadow-md hover:bg-gray-400 transition duration-300">
               Back
             </button>

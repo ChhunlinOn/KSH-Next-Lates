@@ -85,12 +85,16 @@ const ResidentDetailPage: React.FC = () => {
     </button>
   </Link>
   <div className="flex gap-2 sm:gap-4 whitespace-nowrap">
+    <Link href={`/dashbaord/pages/resident/residentInfo/${id}/residentChecklist`}>
     <button className="bg-green-700 text-white px-3 py-2 sm:px-4 sm:py-2 md:px-6 md:py-2 rounded-lg shadow-md hover:bg-green-600 transition duration-300 text-xs sm:text-sm md:text-base whitespace-nowrap">
       Program
     </button>
+    </Link>
+    <Link href={`/dashbaord/pages/medical`}>
     <button className="bg-red-700 text-white px-3 py-2 sm:px-4 sm:py-2 md:px-6 md:py-2 rounded-lg shadow-md hover:bg-red-600 transition duration-300 text-xs sm:text-sm md:text-base whitespace-nowrap">
       Medical
     </button>
+    </Link>
   </div>
 </div>
 
