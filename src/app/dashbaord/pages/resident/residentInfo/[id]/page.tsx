@@ -61,6 +61,37 @@ const ResidentDetailPage: React.FC = () => {
   }
   , []);
 
+ const handlecheckmedical = async () => {
+  try {
+    const response = await fetch(
+      `${api_url}/resident-medicals?filters[resident][id][$eq]=${id}&populate[resident][populate][profile_img_url]=true&populate[medical_comments]=*&populate[medical_url_drives]=*`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const data = await response.json();
+    console.log('check medical', data.data);
+    
+    if (data.data.length === 0) {
+      alert('This resident has no medical records.');
+      return; // Prevent navigation
+    }
+    
+    // Navigate to the medical page with the first medical record's ID
+    window.location.href = `/dashbaord/pages/medical/medicalInfo/${data.data[0].id}`;
+  } catch (error) {
+    console.error('Error fetching medical data:', error);
+    alert('An error occurred while fetching medical data.');
+  }
+};
+
   const residentData = {
     fullname_english: resident?.fullname_english || 'none',
     gender: resident?.gender || 'none',
@@ -90,11 +121,11 @@ const ResidentDetailPage: React.FC = () => {
       Program
     </button>
     </Link>
-    <Link href={`/dashbaord/pages/medical`}>
-    <button className="bg-red-700 text-white px-3 py-2 sm:px-4 sm:py-2 md:px-6 md:py-2 rounded-lg shadow-md hover:bg-red-600 transition duration-300 text-xs sm:text-sm md:text-base whitespace-nowrap">
+    {/* <Link href={`/dashbaord/pages/medical`}> */}
+    <button onClick={handlecheckmedical} className="bg-red-700 text-white px-3 py-2 sm:px-4 sm:py-2 md:px-6 md:py-2 rounded-lg shadow-md hover:bg-red-600 transition duration-300 text-xs sm:text-sm md:text-base whitespace-nowrap">
       Medical
     </button>
-    </Link>
+    {/* </Link> */}
   </div>
 </div>
 

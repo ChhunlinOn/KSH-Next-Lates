@@ -36,7 +36,13 @@ export function MobileSidebar() {
       name: "salary",
       Img: "/money.png",
       href: "/dashbaord/pages/salary",
+    },
+    {
+      name: "Staff",
+      Img: "/staff.png",
+      href: "/dashbaord/pages/profile",
     }
+
   ]
 
   const handleSignOut = async () => {

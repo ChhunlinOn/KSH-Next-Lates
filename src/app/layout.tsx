@@ -10,9 +10,10 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "KSH",
-  description: "Resident management system for KSH",
-}
+  title: 'Acme Dashboard',
+  description: 'The official Next.js Course Dashboard, built with App Router.',
+  // metadataBase: new URL('https://next-learn-dashboard.vercel.sh'),
+};
 
 export default function RootLayout({
   children,
