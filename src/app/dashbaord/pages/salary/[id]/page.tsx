@@ -5,8 +5,10 @@ import { FaPlus, FaEdit, FaTrash, FaTimes } from "react-icons/fa"
 import Link from "next/link"
 import Image from "next/image"
 import { useParams } from "next/navigation"
+import { getSessionForClient } from "@/app/action/clientauth"
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
-const TOKEN = process.env.NEXT_PUBLIC_TOKEN;
+const session = getSessionForClient();
+const TOKEN = session?.jwt;
 
 interface SalaryData {
   id?: number

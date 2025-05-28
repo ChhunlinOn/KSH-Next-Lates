@@ -22,7 +22,7 @@ export default function LoginPage() {
       const result = await login(email, password)
 
       if (result.success) {
-        router.push("/dashbaord") // Redirect to dashboard home
+        router.push("/dashbaord/pages/resident") // Redirect to dashboard home
         router.refresh() // Refresh to update auth state
       } else {
         setError(result.error || "Login failed")

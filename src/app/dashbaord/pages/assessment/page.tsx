@@ -3,8 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { FaWpforms, FaEdit, FaPlus, FaSearch, FaTrash, FaTimes, FaSave } from 'react-icons/fa';
 import { MdArrowForward } from 'react-icons/md';
 import axios from "axios";
+import { getSessionForClient } from '@/app/action/clientauth';
 
 const Assessment: React.FC = () => {
+  const session = getSessionForClient();
   const [assessments, setAssessments] = useState<any[]>([]);
   const [editId, setEditId] = useState<number | null>(null);
   const [editValues, setEditValues] = useState({ title: '', url: '' });
@@ -18,7 +20,7 @@ const Assessment: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const api_url = process.env.NEXT_PUBLIC_API_URL;
-  const token = process.env.NEXT_PUBLIC_TOKEN;
+  const token = session?.jwt;
 
   const fetchAssessments = async () => {
     try {

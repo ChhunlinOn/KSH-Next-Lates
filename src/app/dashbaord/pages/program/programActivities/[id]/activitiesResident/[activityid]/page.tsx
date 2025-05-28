@@ -8,11 +8,13 @@ import Link from "next/link";
 import dotenv from "dotenv";
 import { useParams } from "next/navigation";
 import { downloadExcel } from "react-export-table-to-excel";
+import { getSessionForClient } from "@/app/action/clientauth";
 
 const ActivitiesResident = () => {
   dotenv.config();
   const api_url = process.env.NEXT_PUBLIC_API_URL;
-  const token = process.env.NEXT_PUBLIC_TOKEN;
+  const session = getSessionForClient();
+  const token = session?.jwt;
   const { id } = useParams();
   const { activityid } = useParams();
   // const id = params.id;

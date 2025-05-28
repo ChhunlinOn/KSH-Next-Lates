@@ -4,8 +4,8 @@ import Link from 'next/link';
 import { FaTimes, FaPlus } from 'react-icons/fa';
 import ResidentBoxInfo from '../../../../../component/residentBoxInfo';
 import { useParams } from 'next/navigation';
-import dotenv from "dotenv"
 import formatDate from '@/app/component/Formatdate';
+import { getSessionForClient } from '@/app/action/clientauth';
 
 interface CustomInfo {
   name: string;
@@ -13,9 +13,9 @@ interface CustomInfo {
 }
 
 const ResidentDetailPage: React.FC = () => {
-   dotenv.config();
+  const session = getSessionForClient();
     const api_url = process.env.NEXT_PUBLIC_API_URL; 
-    const token = process.env.NEXT_PUBLIC_TOKEN;
+    const token = session?.jwt;
   const [showAddResidentModal, setShowAddResidentModal] = useState(false);
   const [newInfo, setNewInfo] = useState<CustomInfo>({ name: '', value: '' });
   const [customInfos, setCustomInfos] = useState<CustomInfo[]>([]);

@@ -7,9 +7,11 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
+import { getSessionForClient } from "../action/clientauth";
+const session = getSessionForClient();
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
-const TOKEN = process.env.NEXT_PUBLIC_TOKEN;
+const TOKEN = session?.jwt;
 
 export interface ProgramActivity {
   id: string;

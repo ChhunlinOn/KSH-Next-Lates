@@ -6,6 +6,7 @@ import ResidentBoxInfo from "../../../../../component/medicalBoxInfo";
 import { useParams } from "next/navigation";
 import dotenv, { populate } from "dotenv";
 import { all } from "axios";
+import { getSessionForClient } from "@/app/action/clientauth";
 
 interface CustomInfo {
   id?: string; 
@@ -45,8 +46,9 @@ const MedicalDetailPage: React.FC = () => {
   console.log("custom Infos", getcomments);
 
   dotenv.config();
+  const session = getSessionForClient();
   const api_url = process.env.NEXT_PUBLIC_API_URL;
-  const token = process.env.NEXT_PUBLIC_TOKEN;
+  const token = session?.jwt;
   const params = useParams();
   const id = params.id;
 

@@ -3,11 +3,13 @@ import { useState, useEffect } from "react";
 import { Edit, ArrowLeft, X, Eye, EyeOff } from "lucide-react"; // Add Eye, EyeOff
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { getSessionForClient } from "@/app/action/clientauth"; // Adjust the import path as needed
 
 const ProfileInfoPage = () => {
   const { id } = useParams();
   const api_url = process.env.NEXT_PUBLIC_API_URL;
-  const token = process.env.NEXT_PUBLIC_TOKEN;
+  const session = getSessionForClient();
+  const token = session?.jwt;
 
   type User = {
     id: number;

@@ -3,12 +3,12 @@ import React, { useState,useEffect } from "react";
 import BoxResident from "../../../component/boxResident";
 import DropdownYearResident from "../../../component/dropDownYearResident";
 import { FaPlus, FaTimes, FaSearch } from "react-icons/fa";
-import dotenv from "dotenv";
+import { getSessionForClient } from "@/app/action/clientauth";
 
 const ResidentList: React.FC = () => {
-  dotenv.config();
+    const session = getSessionForClient();
   const api_url = process.env.NEXT_PUBLIC_API_URL; 
-  const token = process.env.NEXT_PUBLIC_TOKEN;
+  const token = session?.jwt;
   console.log("API URL:", api_url);
   console.log("Token:", token);
   const [residents, setResidents] = useState<any[]>([]);

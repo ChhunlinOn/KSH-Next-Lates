@@ -1,7 +1,7 @@
 import type React from "react";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { ClientLayoutWrapper } from "../component/layout"; // path to the wrapper
+import { ClientLayoutWrapper } from "../component/layout";
 import { getSession } from "../action/auth";
 
 export const metadata: Metadata = {
@@ -14,7 +14,7 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Example server-side auth
+  // Server-side session check
   const session = await getSession();
   if (!session) redirect("/login");
 

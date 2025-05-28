@@ -9,9 +9,11 @@ import React, {
 } from "react";
 import dotenv from "dotenv";
 dotenv.config();
+import { getSessionForClient } from "../action/clientauth";
+const session = getSessionForClient();
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
-const TOKEN = process.env.NEXT_PUBLIC_TOKEN;
+const TOKEN = session?.jwt;
 
 // 1. Define the Program interface
 export interface Program {

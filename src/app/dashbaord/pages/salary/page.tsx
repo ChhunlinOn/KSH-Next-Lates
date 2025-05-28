@@ -788,9 +788,12 @@ import React, { useState, useEffect } from 'react';
 import BoxSalary from '../../../component/boxSalary';
 import { FaPlus, FaTimes, FaSearch } from 'react-icons/fa';
 import axios from 'axios';
+import { getSessionForClient } from "@/app/action/clientauth";
+
+const session = getSessionForClient();
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
-const TOKEN = process.env.NEXT_PUBLIC_TOKEN;
+const TOKEN = session?.jwt;
 
 const ResidentList: React.FC = () => {
   const [input, setInput] = useState('');
