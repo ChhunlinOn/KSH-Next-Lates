@@ -21,13 +21,13 @@ export async function middleware(request: NextRequest) {
 
   // If user visits login page but already has a token, redirect to dashboard
   if (pathname === "/login" && jwt) {
-    return NextResponse.redirect(new URL("/dashbaord", request.url))
+    return NextResponse.redirect(new URL("/dashbaord/pages/resident", request.url))
   }
 
   // If user visits the root path, redirect based on authentication status
   if (pathname === "/") {
     if (jwt) {
-      return NextResponse.redirect(new URL("/dashbaord", request.url))
+      return NextResponse.redirect(new URL("/dashbaord/pages/resident", request.url))
     } else {
       return NextResponse.redirect(new URL("/login", request.url))
     }
